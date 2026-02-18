@@ -1,0 +1,34 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(node --version:*)",
+      "Bash(npm --version:*)",
+      "Bash(ng version:*)",
+      "Bash(npx @angular/cli@latest version:*)",
+      "Bash(npm info:*)",
+      "WebFetch(domain:angular.dev)",
+      "WebFetch(domain:www.spartan.ng)",
+      "WebFetch(domain:www.npmjs.com)",
+      "Bash(npm view:*)",
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:gist.github.com)",
+      "WebFetch(domain:spartan.ng)",
+      "WebFetch(domain:www.pacyfist.dev)",
+      "WebFetch(domain:nx.dev)",
+      "WebFetch(domain:glensea.com)",
+      "WebFetch(domain:muratkaragozgil.com)",
+      "Bash(where:*)",
+      "Bash(npm install:*)",
+      "Bash(npx ng g @spartan-ng/cli:ui button:*)",
+      "Bash(npx ng g:*)",
+      "Bash(printf:*)",
+      "Bash(npx ng build:*)",
+      "Bash(dir:*)",
+      "Bash(xcopy:*)",
+      "Bash(powershell -Command \"Copy-Item ''C:\\\\Users\\\\User\\\\PROJETOS\\\\front-fretesja\\\\src\\\\assets\\\\background.jpeg'' ''C:\\\\Users\\\\User\\\\PROJETOS\\\\front-fretesja\\\\public\\\\background.jpeg'' -Force; Write-Host ''OK''\")",
+      "Bash(git init:*)",
+      "Bash(git remote add:*)",
+      "Bash(git add:*)"
+    ]
+  }
+}

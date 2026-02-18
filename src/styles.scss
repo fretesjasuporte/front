@@ -1,0 +1,120 @@
+/* Tailwind CSS v4 layers + Spartan UI theme */
+@layer theme, base, components, utilities;
+@import "tailwindcss/theme.css" layer(theme);
+@import "tailwindcss/preflight.css" layer(base);
+@import "tailwindcss/utilities.css";
+@import "@spartan-ng/brain/hlm-tailwind-preset.css";
+
+/* Spartan UI design tokens + brand colors → Tailwind CSS v4 theme variables */
+@theme inline {
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+
+  /* Brand colors — logística: vermelho, laranja, amarelo */
+  --color-brand-green: var(--brand-green);
+  --color-brand-green-hover: var(--brand-green-hover);
+  --color-brand-green-foreground: var(--brand-green-foreground);
+  --color-brand-yellow: var(--brand-yellow);
+  --color-brand-yellow-hover: var(--brand-yellow-hover);
+  --color-brand-yellow-foreground: var(--brand-yellow-foreground);
+}
+
+/* Light theme */
+:root {
+  --radius: 0.625rem;
+
+  /* 🔴 Vermelho (primary) — botões, links ativos, step numbers */
+  --primary: oklch(0.53 0.22 27);
+  --primary-foreground: oklch(1 0 0);
+  --ring: oklch(0.53 0.22 27);
+
+  /* 🟠 Laranja (brand-green) — logo "JA", ícones, dot status */
+  --brand-green: oklch(0.69 0.19 50);
+  --brand-green-hover: oklch(0.62 0.18 50);
+  --brand-green-foreground: oklch(1 0 0);
+
+  /* 🟡 Amarelo/Âmbar (brand-yellow) — gradientes, badges, destaques */
+  --brand-yellow: oklch(0.84 0.17 88);
+  --brand-yellow-hover: oklch(0.77 0.17 88);
+  --brand-yellow-foreground: oklch(0.18 0.04 70);
+
+  --background: oklch(1 0 0);
+  --foreground: oklch(0.129 0.042 264.695);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.129 0.042 264.695);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.129 0.042 264.695);
+  --secondary: oklch(0.968 0.007 247.896);
+  --secondary-foreground: oklch(0.208 0.042 265.755);
+  --muted: oklch(0.968 0.007 247.896);
+  --muted-foreground: oklch(0.554 0.046 257.417);
+  --accent: oklch(0.968 0.007 247.896);
+  --accent-foreground: oklch(0.208 0.042 265.755);
+  --destructive: oklch(0.577 0.245 27.325);
+  --destructive-foreground: oklch(0.984 0.003 247.858);
+  --border: oklch(0.929 0.013 255.508);
+  --input: oklch(0.929 0.013 255.508);
+}
+
+/* Dark theme */
+.dark {
+  --primary: oklch(0.65 0.20 27);
+  --primary-foreground: oklch(1 0 0);
+  --ring: oklch(0.65 0.20 27);
+  --brand-green: oklch(0.76 0.17 50);
+  --brand-green-hover: oklch(0.69 0.17 50);
+  --brand-yellow: oklch(0.88 0.15 88);
+  --brand-yellow-hover: oklch(0.82 0.15 88);
+  --background: oklch(0.129 0.042 264.695);
+  --foreground: oklch(0.984 0.003 247.858);
+  --card: oklch(0.208 0.042 265.755);
+  --card-foreground: oklch(0.984 0.003 247.858);
+  --popover: oklch(0.208 0.042 265.755);
+  --popover-foreground: oklch(0.984 0.003 247.858);
+  --secondary: oklch(0.279 0.041 260.031);
+  --secondary-foreground: oklch(0.984 0.003 247.858);
+  --muted: oklch(0.279 0.041 260.031);
+  --muted-foreground: oklch(0.704 0.04 256.788);
+  --accent: oklch(0.279 0.041 260.031);
+  --accent-foreground: oklch(0.984 0.003 247.858);
+  --destructive: oklch(0.396 0.141 25.723);
+  --destructive-foreground: oklch(0.984 0.003 247.858);
+  --border: oklch(1 0 0 / 10%);
+  --input: oklch(1 0 0 / 15%);
+}
+
+/* Global base styles */
+* {
+  border-color: var(--border);
+}
+
+body {
+  background-color: var(--background);
+  color: var(--foreground);
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}

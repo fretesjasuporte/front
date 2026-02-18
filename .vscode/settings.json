@@ -1,0 +1,7 @@
+{
+  "tailwindCSS.classFunctions": ["hlm", "cva", "classes"],
+  "tailwindCSS.experimental.classRegex": [
+    ["cva\\(([^)]*)\\)", "[\"'`]([^\"'`]*).*?[\"'`]"],
+    ["classes\\(([^)]*)\\)", "\"([^\"]*)\""]
+  ]
+}
