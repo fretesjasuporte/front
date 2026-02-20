@@ -53,9 +53,34 @@
 
       <!-- Desktop CTA -->
       <div class="hidden lg:flex items-center gap-3">
-        <a routerLink="/cadastrar-caminhao" hlmBtn size="sm" class="font-semibold">
-          Cadastrar caminhão
-        </a>
+        @if (auth.isAuthenticated()) {
+          <!-- Usuário logado -->
+          <span
+            class="text-sm font-medium transition-colors"
+            [class]="scrolled() ? 'text-slate-700' : 'text-slate-200'"
+          >
+            {{ auth.currentUser()?.name }}
+          </span>
+          <button hlmBtn variant="outline" size="sm" (click)="logout()"
+            class="font-semibold border-white/20 text-white bg-white/5 hover:bg-white/10"
+            [class]="scrolled() ? 'border-slate-300 text-slate-700 bg-transparent hover:bg-slate-100' : ''"
+          >
+            Sair
+          </button>
+        } @else {
+          <!-- Visitante -->
+          <a
+            routerLink="/login"
+            hlmBtn variant="ghost" size="sm"
+            class="font-semibold"
+            [class]="scrolled() ? 'text-slate-700 hover:bg-slate-100' : 'text-slate-200 hover:text-white hover:bg-white/10'"
+          >
+            Entrar
+          </a>
+          <a routerLink="/cadastro/caminhoneiro" hlmBtn size="sm" class="font-semibold">
+            Cadastrar caminhão
+          </a>
+        }
       </div>
 
       <!-- Mobile hamburger -->
@@ -107,10 +132,22 @@
         >
           Cadastrar Caminhão
         </a>
-        <div class="pt-2 mt-2 border-t border-slate-100">
-          <a routerLink="/cadastrar-caminhao" hlmBtn (click)="closeMenu()" class="w-full font-semibold">
-            Cadastrar caminhão
-          </a>
+        <div class="pt-2 mt-2 border-t border-slate-100 flex flex-col gap-2">
+          @if (auth.isAuthenticated()) {
+            <div class="px-4 py-2 text-sm font-medium text-slate-500">
+              {{ auth.currentUser()?.name }}
+            </div>
+            <button hlmBtn variant="outline" (click)="logout()" class="w-full font-semibold">
+              Sair
+            </button>
+          } @else {
+            <a routerLink="/login" hlmBtn variant="outline" (click)="closeMenu()" class="w-full font-semibold">
+              Entrar
+            </a>
+            <a routerLink="/cadastro/caminhoneiro" hlmBtn (click)="closeMenu()" class="w-full font-semibold">
+              Cadastrar caminhão
+            </a>
+          }
         </div>
       </nav>
     </div>

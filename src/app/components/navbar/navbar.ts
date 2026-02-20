@@ -1,6 +1,7 @@
-import { Component, HostListener, signal } from '@angular/core';
+import { Component, HostListener, inject, signal } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { HlmButton } from '@spartan-ng/helm/button';
+import { AuthService } from '../../core/services/auth.service';
 
 @Component({
   selector: 'app-navbar',
@@ -8,6 +9,7 @@ import { HlmButton } from '@spartan-ng/helm/button';
   templateUrl: './navbar.html',
 })
 export class NavbarComponent {
+  readonly auth = inject(AuthService);
   readonly scrolled = signal(false);
   readonly mobileMenuOpen = signal(false);
 
@@ -22,5 +24,10 @@ export class NavbarComponent {
 
   closeMenu() {
     this.mobileMenuOpen.set(false);
+  }
+
+  logout() {
+    this.closeMenu();
+    this.auth.logout();
   }
 }

@@ -77,17 +77,17 @@
 
 ### Checklist
 
-- [ ] Página de Login (`/login`) com form email + senha
-- [ ] Redirecionar após login conforme role (`/motorista/dashboard` ou `/transportadora/dashboard`)
-- [ ] Página de Cadastro de Caminhoneiro (`/cadastro/caminhoneiro`)
-- [ ] Página de Cadastro de Transportadora (`/cadastro/transportadora`)
-- [ ] Página Esqueci Minha Senha (`/auth/esqueci-senha`)
-- [ ] Página Nova Senha (`/auth/nova-senha`) — extrai token do hash da URL
-- [ ] Navbar: exibir nome do usuário + botão Logout quando autenticado
-- [ ] Navbar: exibir botões de Login/Cadastro quando não autenticado
-- [ ] Redirecionar `/cadastrar-caminhao` para `/cadastro/caminhoneiro`
+- [x] Página de Login (`/login`) com form email + senha
+- [x] Redirecionar após login conforme role (`/motorista/dashboard` ou `/transportadora/dashboard`)
+- [x] Página de Cadastro de Caminhoneiro (`/cadastro/caminhoneiro`)
+- [x] Página de Cadastro de Transportadora (`/cadastro/transportadora`)
+- [x] Página Esqueci Minha Senha (`/auth/esqueci-senha`)
+- [x] Página Nova Senha (`/auth/nova-senha`) — lê token via query param `?token=`
+- [x] Navbar: exibir nome do usuário + botão Logout quando autenticado
+- [x] Navbar: exibir botões de Login/Cadastro quando não autenticado
+- [x] Redirecionar `/cadastrar-caminhao` para `/cadastro/caminhoneiro`
 
-**Status: 🔲 Pendente**
+**Status: ✅ Concluída**
 
 ---
 
