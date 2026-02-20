@@ -1,0 +1,201 @@
+<!-- Header -->
+<div class="pt-20 bg-slate-950">
+  <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+    <span class="text-brand-green text-sm font-semibold tracking-widest uppercase">Perfil</span>
+    <h1 class="text-4xl sm:text-5xl font-bold text-white mt-3 leading-tight">Minha Transportadora</h1>
+    <p class="text-slate-300 text-lg mt-3 leading-relaxed">
+      Gerencie os dados da sua empresa.
+    </p>
+  </div>
+</div>
+
+<!-- Content -->
+<section class="py-10 bg-slate-50 min-h-screen">
+  <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
+
+    @if (loading()) {
+      <div class="bg-white rounded-2xl border border-slate-200 p-8 animate-pulse space-y-4">
+        <div class="h-5 bg-slate-200 rounded w-48"></div>
+        <div class="grid grid-cols-2 gap-4 mt-6">
+          @for (i of [1,2,3,4,5,6]; track i) {
+            <div class="space-y-1.5">
+              <div class="h-3 bg-slate-200 rounded w-24"></div>
+              <div class="h-4 bg-slate-100 rounded w-40"></div>
+            </div>
+          }
+        </div>
+      </div>
+    } @else if (error()) {
+      <div class="bg-red-50 border border-red-200 rounded-2xl p-6 text-center">
+        <p class="text-red-700">{{ error() }}</p>
+        <button hlmBtn variant="outline" class="mt-3" (click)="loadProfile()">Tentar novamente</button>
+      </div>
+    } @else if (profile()) {
+
+      @if (saveSuccess()) {
+        <div class="bg-green-50 border border-green-200 rounded-xl px-4 py-3 flex items-center gap-3">
+          <svg class="w-5 h-5 text-green-600 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M20 6 9 17l-5-5"/>
+          </svg>
+          <p class="text-sm text-green-700 font-medium">Perfil atualizado com sucesso!</p>
+        </div>
+      }
+
+      @if (!editMode()) {
+        <!-- View Mode -->
+        <div class="bg-white rounded-2xl border border-slate-200 p-6">
+          <div class="flex items-center justify-between mb-6">
+            <h2 class="text-lg font-semibold text-slate-900">Dados da Empresa</h2>
+            <button hlmBtn variant="outline" size="sm" (click)="startEdit()">Editar</button>
+          </div>
+
+          <dl class="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-5">
+            <div>
+              <dt class="text-xs font-medium text-slate-500 uppercase tracking-wide">CNPJ</dt>
+              <dd class="mt-1 text-sm text-slate-900 font-mono">{{ profile()!.cnpj }}</dd>
+            </div>
+            <div>
+              <dt class="text-xs font-medium text-slate-500 uppercase tracking-wide">Razão Social</dt>
+              <dd class="mt-1 text-sm text-slate-900">{{ profile()!.legal_name }}</dd>
+            </div>
+            <div>
+              <dt class="text-xs font-medium text-slate-500 uppercase tracking-wide">Nome Fantasia</dt>
+              <dd class="mt-1 text-sm text-slate-900">{{ profile()!.trade_name || '—' }}</dd>
+            </div>
+            <div>
+              <dt class="text-xs font-medium text-slate-500 uppercase tracking-wide">E-mail Comercial</dt>
+              <dd class="mt-1 text-sm text-slate-900">{{ profile()!.business_email || '—' }}</dd>
+            </div>
+            <div>
+              <dt class="text-xs font-medium text-slate-500 uppercase tracking-wide">Responsável</dt>
+              <dd class="mt-1 text-sm text-slate-900">{{ profile()!.profile.name }}</dd>
+            </div>
+            <div>
+              <dt class="text-xs font-medium text-slate-500 uppercase tracking-wide">Telefone</dt>
+              <dd class="mt-1 text-sm text-slate-900">{{ profile()!.profile.phone }}</dd>
+            </div>
+          </dl>
+
+          @if (profile()!.address) {
+            <div class="mt-6 pt-6 border-t border-slate-100">
+              <h3 class="text-sm font-semibold text-slate-700 mb-4">Endereço</h3>
+              <dl class="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-5">
+                <div class="sm:col-span-2">
+                  <dt class="text-xs font-medium text-slate-500 uppercase tracking-wide">Logradouro</dt>
+                  <dd class="mt-1 text-sm text-slate-900">
+                    {{ profile()!.address!.street }}
+                    @if (profile()!.address!.number) {, {{ profile()!.address!.number }}}
+                    @if (profile()!.address!.complement) { — {{ profile()!.address!.complement }}}
+                  </dd>
+                </div>
+                <div>
+                  <dt class="text-xs font-medium text-slate-500 uppercase tracking-wide">Bairro</dt>
+                  <dd class="mt-1 text-sm text-slate-900">{{ profile()!.address!.neighborhood || '—' }}</dd>
+                </div>
+                <div>
+                  <dt class="text-xs font-medium text-slate-500 uppercase tracking-wide">Cidade / Estado</dt>
+                  <dd class="mt-1 text-sm text-slate-900">
+                    {{ profile()!.address!.city }}
+                    @if (profile()!.address!.state) { / {{ profile()!.address!.state }}}
+                  </dd>
+                </div>
+                <div>
+                  <dt class="text-xs font-medium text-slate-500 uppercase tracking-wide">CEP</dt>
+                  <dd class="mt-1 text-sm text-slate-900 font-mono">{{ profile()!.address!.zip_code || '—' }}</dd>
+                </div>
+              </dl>
+            </div>
+          }
+        </div>
+
+      } @else {
+        <!-- Edit Mode -->
+        <div class="bg-white rounded-2xl border border-slate-200 p-6">
+          <h2 class="text-lg font-semibold text-slate-900 mb-6">Editar Perfil</h2>
+
+          <div class="space-y-6">
+            <!-- Responsável -->
+            <div>
+              <h3 class="text-sm font-semibold text-slate-700 mb-4">Responsável</h3>
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label class="block text-sm font-medium text-slate-700 mb-1.5">Nome</label>
+                  <input hlmInput type="text" [(ngModel)]="editName" class="w-full" />
+                </div>
+                <div>
+                  <label class="block text-sm font-medium text-slate-700 mb-1.5">Telefone</label>
+                  <input hlmInput type="tel" [(ngModel)]="editPhone" class="w-full" [appMask]="'phone'" />
+                </div>
+              </div>
+            </div>
+
+            <!-- Empresa -->
+            <div class="pt-4 border-t border-slate-100">
+              <h3 class="text-sm font-semibold text-slate-700 mb-4">Dados da Empresa</h3>
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label class="block text-sm font-medium text-slate-700 mb-1.5">Razão Social</label>
+                  <input hlmInput type="text" [(ngModel)]="editLegalName" class="w-full" />
+                </div>
+                <div>
+                  <label class="block text-sm font-medium text-slate-700 mb-1.5">Nome Fantasia</label>
+                  <input hlmInput type="text" [(ngModel)]="editTradeName" class="w-full" />
+                </div>
+                <div class="sm:col-span-2">
+                  <label class="block text-sm font-medium text-slate-700 mb-1.5">E-mail Comercial</label>
+                  <input hlmInput type="email" [(ngModel)]="editBusinessEmail" class="w-full" />
+                </div>
+              </div>
+            </div>
+
+            <!-- Endereço -->
+            <div class="pt-4 border-t border-slate-100">
+              <h3 class="text-sm font-semibold text-slate-700 mb-4">Endereço</h3>
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div class="sm:col-span-2">
+                  <label class="block text-sm font-medium text-slate-700 mb-1.5">Logradouro</label>
+                  <input hlmInput type="text" [(ngModel)]="editStreet" class="w-full" />
+                </div>
+                <div>
+                  <label class="block text-sm font-medium text-slate-700 mb-1.5">Número</label>
+                  <input hlmInput type="text" [(ngModel)]="editNumber" class="w-full" />
+                </div>
+                <div>
+                  <label class="block text-sm font-medium text-slate-700 mb-1.5">Complemento</label>
+                  <input hlmInput type="text" [(ngModel)]="editComplement" class="w-full" />
+                </div>
+                <div>
+                  <label class="block text-sm font-medium text-slate-700 mb-1.5">Bairro</label>
+                  <input hlmInput type="text" [(ngModel)]="editNeighborhood" class="w-full" />
+                </div>
+                <div>
+                  <label class="block text-sm font-medium text-slate-700 mb-1.5">CEP</label>
+                  <input hlmInput type="text" [(ngModel)]="editZipCode" maxlength="8" class="w-full" />
+                </div>
+                <div>
+                  <label class="block text-sm font-medium text-slate-700 mb-1.5">Cidade</label>
+                  <input hlmInput type="text" [(ngModel)]="editCity" class="w-full" />
+                </div>
+                <div>
+                  <label class="block text-sm font-medium text-slate-700 mb-1.5">Estado (UF)</label>
+                  <input hlmInput type="text" [(ngModel)]="editState" maxlength="2" placeholder="SP" class="w-full uppercase" />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          @if (saveError()) {
+            <p class="text-sm text-red-600 mt-4">{{ saveError() }}</p>
+          }
+
+          <div class="mt-6 flex justify-end gap-3">
+            <button hlmBtn variant="outline" (click)="cancelEdit()">Cancelar</button>
+            <button hlmBtn (click)="saveEdit()" [disabled]="saving()">
+              @if (saving()) { Salvando... } @else { Salvar alterações }
+            </button>
+          </div>
+        </div>
+      }
+    }
+  </div>
+</section>

@@ -31,6 +31,12 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
         return throwError(() => error);
       }
 
+      // Se não há access_token, o 401 veio de login/registro com credenciais inválidas
+      // Propaga o erro original do servidor sem tentar refresh
+      if (!localStorage.getItem('access_token')) {
+        return throwError(() => error);
+      }
+
       if (isRefreshing) {
         // Aguarda o refresh terminar e reenvia a requisição com o novo token
         return refreshComplete$.pipe(

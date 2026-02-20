@@ -4,6 +4,7 @@ import { Router, RouterLink } from '@angular/router';
 import { HlmButton } from '@spartan-ng/helm/button';
 import { HlmInput } from '@spartan-ng/helm/input';
 import { AuthService } from '../../../core/services/auth.service';
+import { MaskDirective } from '../../../core/directives/mask.directive';
 
 function passwordStrength(control: AbstractControl): ValidationErrors | null {
   const value: string = control.value ?? '';
@@ -19,7 +20,7 @@ function passwordStrength(control: AbstractControl): ValidationErrors | null {
 @Component({
   selector: 'app-cadastro-transportadora',
   standalone: true,
-  imports: [ReactiveFormsModule, RouterLink, HlmButton, HlmInput],
+  imports: [ReactiveFormsModule, RouterLink, HlmButton, HlmInput, MaskDirective],
   templateUrl: './cadastro-transportadora.html',
 })
 export class CadastroTransportadoraComponent {
@@ -98,13 +99,14 @@ export class CadastroTransportadoraComponent {
       },
       error: (err) => {
         this.loading.set(false);
-        const code = err?.error?.error?.code;
+        const code = err?.error?.error?.code ?? err?.error?.code;
+        const msg = err?.error?.error?.message ?? err?.error?.message;
         if (code === 'EMAIL_JA_CADASTRADO') {
           this.errorMessage.set('Este e-mail já está cadastrado. Faça login ou recupere sua senha.');
         } else if (code === 'CNPJ_JA_CADASTRADO') {
           this.errorMessage.set('Este CNPJ já está cadastrado.');
         } else {
-          this.errorMessage.set('Ocorreu um erro ao criar sua conta. Tente novamente.');
+          this.errorMessage.set('Ocorreu um erro ao criar sua conta.' + (msg ? ' ' + msg : ' Tente novamente.'));
         }
       },
     });

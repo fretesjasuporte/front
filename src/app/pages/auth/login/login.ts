@@ -48,7 +48,9 @@ export class LoginComponent {
       },
       error: (err) => {
         this.loading.set(false);
-        const code = err?.error?.error?.code;
+        const code = err?.error?.error?.code ?? err?.error?.code;
+        const msg = err?.error?.error?.message ?? err?.error?.message;
+
         if (code === 'CREDENCIAIS_INVALIDAS') {
           this.errorMessage.set('E-mail ou senha incorretos.');
         } else if (code === 'EMAIL_NAO_CONFIRMADO') {
@@ -56,7 +58,7 @@ export class LoginComponent {
         } else if (code === 'CONTA_INATIVA') {
           this.errorMessage.set('Sua conta está desativada. Entre em contato com o suporte.');
         } else {
-          this.errorMessage.set('Ocorreu um erro. Tente novamente.');
+          this.errorMessage.set('Ocorreu um erro.' + (msg ? ' ' + msg : ' Tente novamente.'));
         }
       },
     });

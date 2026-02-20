@@ -1,0 +1,174 @@
+<!-- Header -->
+<div class="pt-20 bg-slate-950">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+    <span class="text-brand-green text-sm font-semibold tracking-widest uppercase">Admin</span>
+    <h1 class="text-4xl sm:text-5xl font-bold text-white mt-3 leading-tight">Usuários Admin</h1>
+    <p class="text-slate-300 text-lg mt-3 leading-relaxed max-w-xl">
+      Gerencie administradores e operadores da plataforma.
+    </p>
+  </div>
+</div>
+
+<!-- Content -->
+<section class="py-10 bg-slate-50 min-h-screen">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+
+    <!-- Toolbar -->
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+      <div class="flex items-center gap-3">
+        <select
+          [(ngModel)]="filterRole"
+          (ngModelChange)="applyFilter()"
+          class="rounded-lg border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary bg-white"
+        >
+          <option value="">Todos os papéis</option>
+          <option value="admin">Admin</option>
+          <option value="operator">Operador</option>
+        </select>
+        @if (!loading()) {
+          <p class="text-sm text-slate-500">
+            <span class="font-semibold text-slate-900">{{ total() }}</span> usuário(s)
+          </p>
+        }
+      </div>
+      <button hlmBtn (click)="toggleCreateForm()">
+        @if (showCreateForm()) { Cancelar } @else { + Novo usuário }
+      </button>
+    </div>
+
+    <!-- Create Form -->
+    @if (showCreateForm()) {
+      <div class="bg-white rounded-2xl border border-slate-200 p-6 mb-6">
+        <h2 class="text-base font-semibold text-slate-900 mb-4">Novo usuário</h2>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-sm font-medium text-slate-700 mb-1">Nome *</label>
+            <input hlmInput type="text" [(ngModel)]="newName" placeholder="Nome completo"
+              class="w-full" />
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-slate-700 mb-1">E-mail *</label>
+            <input hlmInput type="email" [(ngModel)]="newEmail" placeholder="email@fretesja.com"
+              class="w-full" />
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-slate-700 mb-1">Senha *</label>
+            <input hlmInput type="password" [(ngModel)]="newPassword"
+              placeholder="Mínimo 8 caracteres" class="w-full" />
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-slate-700 mb-1">Papel *</label>
+            <select
+              [(ngModel)]="newRole"
+              class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary bg-white"
+            >
+              <option value="operator">Operador</option>
+              <option value="admin">Admin</option>
+            </select>
+          </div>
+          <div class="sm:col-span-2">
+            <label class="block text-sm font-medium text-slate-700 mb-1">
+              Telefone <span class="text-slate-400 font-normal">(opcional)</span>
+            </label>
+            <input hlmInput type="tel" [(ngModel)]="newPhone" placeholder="(11) 99999-9999"
+              class="w-full sm:w-64" [appMask]="'phone'" />
+          </div>
+        </div>
+        @if (createError()) {
+          <p class="text-sm text-red-600 mt-3">{{ createError() }}</p>
+        }
+        <div class="mt-4 flex justify-end">
+          <button hlmBtn (click)="createUser()"
+            [disabled]="creating() || !newName.trim() || !newEmail.trim() || !newPassword.trim()">
+            @if (creating()) { Criando... } @else { Criar usuário }
+          </button>
+        </div>
+      </div>
+    }
+
+    <!-- List -->
+    @if (loading()) {
+      <div class="space-y-3">
+        @for (i of [1,2,3,4]; track i) {
+          <div class="bg-white rounded-2xl border border-slate-200 p-5 animate-pulse">
+            <div class="flex justify-between items-center">
+              <div class="space-y-2">
+                <div class="h-4 bg-slate-200 rounded w-36"></div>
+                <div class="h-3 bg-slate-100 rounded w-52"></div>
+              </div>
+              <div class="h-6 bg-slate-200 rounded w-16"></div>
+            </div>
+          </div>
+        }
+      </div>
+    } @else if (error()) {
+      <div class="bg-red-50 border border-red-200 rounded-2xl p-6 text-center">
+        <p class="text-red-700">{{ error() }}</p>
+        <button hlmBtn variant="outline" class="mt-3" (click)="load(true)">Tentar novamente</button>
+      </div>
+    } @else if (!users().length) {
+      <div class="bg-white rounded-2xl border border-slate-200 p-16 text-center">
+        <svg class="w-12 h-12 text-slate-300 mx-auto mb-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+          <circle cx="9" cy="7" r="4"/>
+          <path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/>
+        </svg>
+        <p class="text-slate-500 font-medium">Nenhum usuário encontrado</p>
+      </div>
+    } @else {
+      <div class="space-y-3">
+        @for (user of users(); track user.id) {
+          <div class="bg-white rounded-2xl border border-slate-200 p-5 flex items-center justify-between gap-4 flex-wrap">
+            <div class="flex-1 min-w-0">
+              <div class="flex items-center gap-2 flex-wrap mb-0.5">
+                <p class="font-semibold text-slate-900">{{ user.name }}</p>
+                <span hlmBadge [variant]="roleClass(user.role)">{{ roleLabel(user.role) }}</span>
+              </div>
+              <p class="text-sm text-slate-500">{{ user.email }}</p>
+              @if (user.phone) {
+                <p class="text-sm text-slate-500">{{ user.phone }}</p>
+              }
+              <p class="text-xs text-slate-400 mt-1">
+                Criado em {{ user.created_at | date:'dd/MM/yyyy' }}
+              </p>
+            </div>
+            <button hlmBtn variant="destructive" size="sm" (click)="openDeactivate(user)">
+              Desativar
+            </button>
+          </div>
+        }
+      </div>
+
+      @if (hasMore()) {
+        <div class="mt-6 text-center">
+          <button hlmBtn variant="outline" (click)="loadMore()" [disabled]="loadingMore()">
+            @if (loadingMore()) { Carregando... } @else { Carregar mais }
+          </button>
+        </div>
+      }
+    }
+  </div>
+</section>
+
+<!-- Deactivate Modal -->
+@if (deactivateModal()) {
+  <div
+    class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm px-4"
+    (click)="deactivateModal.set(null)"
+  >
+    <div class="bg-white rounded-2xl p-6 w-full max-w-sm shadow-xl" (click)="$event.stopPropagation()">
+      <h3 class="text-lg font-semibold text-slate-900 mb-2">Desativar usuário?</h3>
+      <p class="text-sm text-slate-500 mb-6">
+        Você está prestes a desativar a conta de
+        <span class="font-semibold text-slate-700">{{ deactivateModal()!.name }}</span>.
+        O usuário não conseguirá fazer login após esta ação.
+      </p>
+      <div class="flex gap-3 justify-end">
+        <button hlmBtn variant="outline" (click)="deactivateModal.set(null)">Cancelar</button>
+        <button hlmBtn variant="destructive" (click)="confirmDeactivate()" [disabled]="deactivating()">
+          @if (deactivating()) { Desativando... } @else { Desativar }
+        </button>
+      </div>
+    </div>
+  </div>
+}
