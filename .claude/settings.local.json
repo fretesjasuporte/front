@@ -28,7 +28,10 @@
       "Bash(powershell -Command \"Copy-Item ''C:\\\\Users\\\\User\\\\PROJETOS\\\\front-fretesja\\\\src\\\\assets\\\\background.jpeg'' ''C:\\\\Users\\\\User\\\\PROJETOS\\\\front-fretesja\\\\public\\\\background.jpeg'' -Force; Write-Host ''OK''\")",
       "Bash(git init:*)",
       "Bash(git remote add:*)",
-      "Bash(git add:*)"
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git push:*)",
+      "Bash(powershell.exe -File:*)"
     ]
   }
 }
