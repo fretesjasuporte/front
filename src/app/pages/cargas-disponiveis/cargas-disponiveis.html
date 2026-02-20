@@ -3,18 +3,26 @@
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
     <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-6">
       <div>
-        <span class="text-brand-green text-sm font-semibold tracking-widest uppercase">Atualizado diariamente</span>
+        <span class="text-brand-green text-sm font-semibold tracking-widest uppercase">Atualizado em tempo real</span>
         <h1 class="text-4xl sm:text-5xl font-bold text-white mt-3 leading-tight">
           Cargas disponíveis
         </h1>
         <p class="text-slate-300 text-lg mt-3 leading-relaxed max-w-xl">
-          Encontre fretes por origem, destino e tipo de veículo. Demonstre interesse
-          e entre em contato direto com o embarcador.
+          Encontre fretes por estado de origem, destino e tipo de veículo.
+          Demonstre interesse diretamente pelo sistema.
         </p>
       </div>
       <div class="flex items-center gap-2 bg-white/5 border border-white/10 rounded-xl px-4 py-3 self-start sm:self-auto flex-shrink-0">
         <div class="w-2 h-2 rounded-full bg-brand-green animate-pulse"></div>
-        <span class="text-slate-300 text-sm font-medium">{{ cargas.length }} cargas disponíveis</span>
+        <span class="text-slate-300 text-sm font-medium">
+          @if (auth.isAuthenticated() && !loading()) {
+            {{ total() }} cargas disponíveis
+          } @else if (loading()) {
+            Carregando...
+          } @else {
+            Faça login para ver as cargas
+          }
+        </span>
       </div>
     </div>
   </div>
@@ -26,108 +34,170 @@
     <div class="flex flex-col sm:flex-row gap-3 items-start sm:items-center">
       <div class="flex flex-col sm:flex-row gap-3 flex-1 w-full">
 
-        <!-- Origem filter -->
-        <div class="relative flex-1">
-          <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/>
-          </svg>
-          <input
-            hlmInput
-            type="text"
-            placeholder="Filtrar por origem..."
-            [ngModel]="filterOrigem()"
-            (ngModelChange)="filterOrigem.set($event)"
-            class="pl-9 w-full"
-          />
-        </div>
-
-        <!-- Destino filter -->
-        <div class="relative flex-1">
-          <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M5 12h14M12 5l7 7-7 7"/>
-          </svg>
-          <input
-            hlmInput
-            type="text"
-            placeholder="Filtrar por destino..."
-            [ngModel]="filterDestino()"
-            (ngModelChange)="filterDestino.set($event)"
-            class="pl-9 w-full"
-          />
-        </div>
-
-        <!-- Tipo veículo filter -->
+        <!-- Estado de origem -->
         <select
-          [ngModel]="filterVeiculo()"
-          (ngModelChange)="filterVeiculo.set($event)"
-          class="flex h-9 rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-xs outline-none focus:ring-[3px] focus:ring-ring/50 focus:border-ring min-w-[180px]"
+          [ngModel]="filterOrigemEstado()"
+          (ngModelChange)="filterOrigemEstado.set($event)"
+          class="flex h-9 rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-xs outline-none focus:ring-[3px] focus:ring-ring/50 focus:border-ring min-w-[160px] flex-1"
+        >
+          <option value="">Origem (estado)</option>
+          @for (estado of estados; track estado.uf) {
+            <option [value]="estado.uf">{{ estado.uf }} — {{ estado.nome }}</option>
+          }
+        </select>
+
+        <!-- Estado de destino -->
+        <select
+          [ngModel]="filterDestinoEstado()"
+          (ngModelChange)="filterDestinoEstado.set($event)"
+          class="flex h-9 rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-xs outline-none focus:ring-[3px] focus:ring-ring/50 focus:border-ring min-w-[160px] flex-1"
+        >
+          <option value="">Destino (estado)</option>
+          @for (estado of estados; track estado.uf) {
+            <option [value]="estado.uf">{{ estado.uf }} — {{ estado.nome }}</option>
+          }
+        </select>
+
+        <!-- Tipo de carga -->
+        <div class="relative flex-1">
+          <input
+            hlmInput
+            type="text"
+            placeholder="Tipo de carga..."
+            [ngModel]="filterTipoCarga()"
+            (ngModelChange)="filterTipoCarga.set($event)"
+            class="w-full"
+          />
+        </div>
+
+        <!-- Tipo de veículo (catálogo) -->
+        <select
+          [ngModel]="filterTruckTypeId()"
+          (ngModelChange)="filterTruckTypeId.set($event)"
+          class="flex h-9 rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-xs outline-none focus:ring-[3px] focus:ring-ring/50 focus:border-ring min-w-[160px]"
         >
           <option value="">Tipo de veículo</option>
-          @for (tipo of tiposVeiculo; track tipo) {
-            <option [value]="tipo">{{ tipo }}</option>
+          @for (tipo of truckTypes(); track tipo.id) {
+            <option [value]="tipo.id">{{ tipo.name }}</option>
           }
         </select>
       </div>
 
-      <!-- Clear filters -->
-      @if (filterOrigem() || filterDestino() || (filterVeiculo() && filterVeiculo() !== 'Todos')) {
-        <button hlmBtn variant="ghost" size="sm" (click)="clearFilters()" class="flex-shrink-0 text-slate-500">
-          <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M18 6 6 18M6 6l12 12"/>
-          </svg>
-          Limpar filtros
+      <!-- Ações dos filtros -->
+      <div class="flex items-center gap-2 flex-shrink-0">
+        <button hlmBtn size="sm" (click)="applyFilters()" class="font-semibold">
+          Buscar
         </button>
-      }
+        @if (hasActiveFilters()) {
+          <button hlmBtn variant="ghost" size="sm" (click)="clearFilters()" class="text-slate-500">
+            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M18 6 6 18M6 6l12 12"/>
+            </svg>
+            Limpar
+          </button>
+        }
+      </div>
     </div>
-
-    @if (cargasFiltradas().length !== cargas.length) {
-      <p class="text-xs text-muted-foreground mt-2">
-        Exibindo {{ cargasFiltradas().length }} de {{ cargas.length }} cargas
-      </p>
-    }
   </div>
 </div>
 
-<!-- Cards grid -->
+<!-- Conteúdo principal -->
 <section class="py-10 bg-slate-50 min-h-screen">
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
-    @if (cargasFiltradas().length === 0) {
+    <!-- Login gate — não autenticado -->
+    @if (!auth.isAuthenticated()) {
+      <div class="flex flex-col items-center justify-center py-24 text-center">
+        <div class="w-20 h-20 rounded-2xl bg-primary/10 flex items-center justify-center mb-5">
+          <svg class="w-10 h-10 text-primary" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+          </svg>
+        </div>
+        <h3 class="text-xl font-semibold text-slate-700 mb-2">Acesso exclusivo para motoristas</h3>
+        <p class="text-slate-500 text-sm mb-6 max-w-sm leading-relaxed">
+          Faça login ou cadastre-se gratuitamente para ver as cargas disponíveis e demonstrar interesse.
+        </p>
+        <div class="flex flex-col sm:flex-row gap-3 justify-center">
+          <a routerLink="/login" hlmBtn class="font-semibold">Entrar</a>
+          <a routerLink="/cadastro/caminhoneiro" hlmBtn variant="outline" class="font-semibold">Cadastrar-se grátis</a>
+        </div>
+      </div>
+
+    <!-- Loading inicial -->
+    } @else if (loading()) {
+      <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
+        @for (i of [1,2,3,4,5,6]; track i) {
+          <div class="bg-white rounded-xl border border-slate-200 p-6 animate-pulse">
+            <div class="h-4 bg-slate-200 rounded w-3/4 mb-3"></div>
+            <div class="h-3 bg-slate-100 rounded w-1/2 mb-6"></div>
+            <div class="space-y-3">
+              <div class="h-3 bg-slate-100 rounded w-full"></div>
+              <div class="h-3 bg-slate-100 rounded w-5/6"></div>
+            </div>
+            <div class="h-9 bg-slate-200 rounded mt-6"></div>
+          </div>
+        }
+      </div>
+
+    <!-- Erro -->
+    } @else if (error()) {
+      <div class="flex flex-col items-center justify-center py-24 text-center">
+        <div class="w-20 h-20 rounded-2xl bg-red-100 flex items-center justify-center mb-5">
+          <svg class="w-10 h-10 text-red-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="8" y2="12"/><line x1="12" x2="12.01" y1="16" y2="16"/>
+          </svg>
+        </div>
+        <h3 class="text-xl font-semibold text-slate-700 mb-2">Erro ao carregar</h3>
+        <p class="text-slate-500 text-sm mb-6">{{ error() }}</p>
+        <button hlmBtn (click)="applyFilters()">Tentar novamente</button>
+      </div>
+
+    <!-- Nenhum resultado -->
+    } @else if (cargas().length === 0) {
       <div class="flex flex-col items-center justify-center py-24 text-center">
         <div class="w-20 h-20 rounded-2xl bg-slate-200 flex items-center justify-center mb-5">
           <svg class="w-10 h-10 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-            <circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3M11 8v3M11 14h.01"/>
+            <circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>
           </svg>
         </div>
         <h3 class="text-xl font-semibold text-slate-700 mb-2">Nenhuma carga encontrada</h3>
-        <p class="text-slate-500 text-sm mb-6 max-w-xs">Tente ajustar os filtros ou limpar a busca para ver todas as cargas disponíveis.</p>
-        <button hlmBtn variant="outline" (click)="clearFilters()">
-          Limpar filtros
-        </button>
+        <p class="text-slate-500 text-sm mb-6 max-w-xs">
+          Tente ajustar os filtros ou aguardar novas publicações.
+        </p>
+        @if (hasActiveFilters()) {
+          <button hlmBtn variant="outline" (click)="clearFilters()">Limpar filtros</button>
+        }
       </div>
+
+    <!-- Lista de cargas -->
     } @else {
       <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
-        @for (carga of cargasFiltradas(); track carga.id) {
+        @for (carga of cargas(); track carga.id) {
           <div hlmCard class="hover:shadow-md transition-all duration-300 hover:-translate-y-0.5 group">
 
             <div hlmCardHeader>
               <div class="flex items-start justify-between gap-3">
                 <div class="flex-1 min-w-0">
-                  <!-- Route -->
+                  <!-- Rota -->
                   <div class="flex items-center gap-1.5 flex-wrap">
-                    <span class="font-semibold text-slate-900 text-sm leading-tight">{{ carga.origem }}</span>
+                    <span class="font-semibold text-slate-900 text-sm leading-tight">
+                      {{ carga.origin.city }}, {{ carga.origin.state }}
+                    </span>
                     <svg class="w-3.5 h-3.5 text-primary flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
                       <path d="M5 12h14M12 5l7 7-7 7"/>
                     </svg>
-                    <span class="font-semibold text-slate-900 text-sm leading-tight">{{ carga.destino }}</span>
+                    <span class="font-semibold text-slate-900 text-sm leading-tight">
+                      {{ carga.destination.city }}, {{ carga.destination.state }}
+                    </span>
                   </div>
+                  <p class="text-xs text-muted-foreground mt-1 truncate">{{ carga.title }}</p>
                 </div>
                 <!-- Badges -->
                 <div class="flex flex-col items-end gap-1.5 flex-shrink-0">
-                  @if (carga.urgente) {
-                    <span hlmBadge variant="destructive">Urgente</span>
+                  @if (carga.featured) {
+                    <span hlmBadge variant="destructive">Destaque</span>
                   }
-                  <span hlmBadge variant="outline" class="text-xs text-slate-400">{{ carga.dataPublicacao }}</span>
+                  <span hlmBadge variant="outline" class="text-xs text-slate-400">{{ formatDate(carga.created_at) }}</span>
                 </div>
               </div>
             </div>
@@ -143,48 +213,221 @@
                   </div>
                   <div>
                     <p class="text-xs text-muted-foreground">Tipo de carga</p>
-                    <p class="text-sm font-medium text-slate-800">{{ carga.tipoCarga }}</p>
+                    <p class="text-sm font-medium text-slate-800">{{ carga.cargo_type }}</p>
                   </div>
                 </div>
 
                 <!-- Tipo de veículo -->
+                @if (carga.truck_type) {
+                  <div class="flex items-center gap-2.5">
+                    <div class="w-7 h-7 rounded-lg bg-primary/8 flex items-center justify-center flex-shrink-0">
+                      <svg class="w-3.5 h-3.5 text-primary" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M3 4a1 1 0 0 1 1-1h9a1 1 0 0 1 .894.553L16.382 7H18a1 1 0 0 1 1 1v5a1 1 0 0 1-1 1h-.17A2 2 0 0 1 14 16H9a2 2 0 0 1-3.83-2H4a1 1 0 0 1-1-1V4z"/>
+                      </svg>
+                    </div>
+                    <div>
+                      <p class="text-xs text-muted-foreground">Veículo necessário</p>
+                      <p class="text-sm font-medium text-slate-800">
+                        {{ carga.truck_type.name }}
+                        @if (carga.body_type) { — {{ carga.body_type.name }} }
+                      </p>
+                    </div>
+                  </div>
+                }
+
+                <!-- Peso -->
                 <div class="flex items-center gap-2.5">
                   <div class="w-7 h-7 rounded-lg bg-primary/8 flex items-center justify-center flex-shrink-0">
-                    <svg class="w-3.5 h-3.5 text-primary" viewBox="0 0 24 24" fill="currentColor">
-                      <path d="M3 4a1 1 0 0 1 1-1h9a1 1 0 0 1 .894.553L16.382 7H18a1 1 0 0 1 1 1v5a1 1 0 0 1-1 1h-.17A2 2 0 0 1 14 16H9a2 2 0 0 1-3.83-2H4a1 1 0 0 1-1-1V4z"/>
+                    <svg class="w-3.5 h-3.5 text-primary" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M12 3a1 1 0 0 1 1 1v1h4a1 1 0 0 1 1 1v2l2 3v5a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-5l2-3V6a1 1 0 0 1 1-1h4V4a1 1 0 0 1 1-1Z"/>
                     </svg>
                   </div>
                   <div>
-                    <p class="text-xs text-muted-foreground">Veículo necessário</p>
-                    <p class="text-sm font-medium text-slate-800">{{ carga.tipoVeiculo }}</p>
+                    <p class="text-xs text-muted-foreground">Peso</p>
+                    <p class="text-sm font-medium text-slate-800">{{ carga.weight_kg.toLocaleString('pt-BR') }} kg</p>
                   </div>
                 </div>
 
                 <!-- Valor -->
                 <div class="flex items-center justify-between pt-2 border-t border-slate-100">
-                  <span class="text-xs text-muted-foreground font-medium">Valor estimado</span>
-                  <span class="text-lg font-bold" [class]="carga.valor === 'Sob consulta' ? 'text-slate-500 text-sm' : 'text-primary'">
-                    {{ carga.valor }}
-                  </span>
+                  <span class="text-xs text-muted-foreground font-medium">Valor do frete</span>
+                  <span class="text-lg font-bold text-primary">{{ formatValue(carga.freight_value) }}</span>
                 </div>
               </div>
             </div>
 
             <div hlmCardFooter class="pt-0">
-              <button
-                hlmBtn
-                class="w-full font-semibold group-hover:shadow-sm transition-shadow"
-                (click)="mostrarInteresse(carga)"
-              >
-                <svg class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413Z"/>
-                </svg>
-                Tenho interesse
-              </button>
+              @if (auth.userRole() === 'trucker') {
+                <button
+                  hlmBtn
+                  class="w-full font-semibold group-hover:shadow-sm transition-shadow"
+                  (click)="abrirModal(carga)"
+                >
+                  <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+                  </svg>
+                  Tenho interesse
+                </button>
+              } @else {
+                <div class="w-full text-center text-xs text-muted-foreground py-2">
+                  Publicado por {{ carga.carrier.trade_name || carga.carrier.legal_name }}
+                </div>
+              }
             </div>
           </div>
         }
       </div>
+
+      <!-- Carregar mais -->
+      @if (hasMore()) {
+        <div class="flex justify-center mt-10">
+          <button hlmBtn variant="outline" size="lg" (click)="loadMore()" [disabled]="loadingMore()" class="font-semibold min-w-[200px]">
+            @if (loadingMore()) {
+              <svg class="w-4 h-4 animate-spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 12a9 9 0 1 1-6.219-8.56"/>
+              </svg>
+              Carregando...
+            } @else {
+              Carregar mais cargas
+            }
+          </button>
+        </div>
+      }
     }
   </div>
 </section>
+
+<!-- Modal "Tenho interesse" -->
+@if (cargaSelecionada()) {
+  <div
+    class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
+    (click)="fecharModal()"
+  >
+    <div
+      class="bg-white rounded-2xl shadow-2xl w-full max-w-md"
+      (click)="$event.stopPropagation()"
+    >
+      <!-- Header modal -->
+      <div class="flex items-start justify-between p-6 border-b border-slate-100">
+        <div>
+          <h2 class="text-lg font-semibold text-slate-900">Demonstrar interesse</h2>
+          <p class="text-sm text-muted-foreground mt-0.5">
+            {{ cargaSelecionada()!.origin.city }}, {{ cargaSelecionada()!.origin.state }}
+            →
+            {{ cargaSelecionada()!.destination.city }}, {{ cargaSelecionada()!.destination.state }}
+          </p>
+        </div>
+        <button
+          (click)="fecharModal()"
+          class="text-slate-400 hover:text-slate-600 transition-colors p-1 rounded-lg hover:bg-slate-100"
+        >
+          <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M18 6 6 18M6 6l12 12"/>
+          </svg>
+        </button>
+      </div>
+
+      <!-- Resumo da carga -->
+      <div class="px-6 py-4 bg-slate-50 border-b border-slate-100">
+        <div class="grid grid-cols-2 gap-3 text-sm">
+          <div>
+            <p class="text-xs text-muted-foreground">Tipo de carga</p>
+            <p class="font-medium text-slate-800">{{ cargaSelecionada()!.cargo_type }}</p>
+          </div>
+          @if (cargaSelecionada()!.truck_type) {
+            <div>
+              <p class="text-xs text-muted-foreground">Veículo</p>
+              <p class="font-medium text-slate-800">{{ cargaSelecionada()!.truck_type!.name }}</p>
+            </div>
+          }
+          <div>
+            <p class="text-xs text-muted-foreground">Peso</p>
+            <p class="font-medium text-slate-800">{{ cargaSelecionada()!.weight_kg.toLocaleString('pt-BR') }} kg</p>
+          </div>
+          <div>
+            <p class="text-xs text-muted-foreground">Valor anunciado</p>
+            <p class="font-semibold text-primary">{{ formatValue(cargaSelecionada()!.freight_value) }}</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Sucesso -->
+      @if (modalSuccess()) {
+        <div class="p-8 text-center">
+          <div class="w-14 h-14 rounded-full bg-green-100 flex items-center justify-center mx-auto mb-4">
+            <svg class="w-7 h-7 text-green-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M20 6 9 17l-5-5"/>
+            </svg>
+          </div>
+          <h3 class="text-lg font-semibold text-slate-900 mb-1">Interesse enviado!</h3>
+          <p class="text-sm text-muted-foreground">A transportadora receberá sua solicitação em breve.</p>
+        </div>
+
+      } @else {
+        <!-- Formulário -->
+        <div class="p-6 flex flex-col gap-4">
+
+          <!-- Erro -->
+          @if (modalError()) {
+            <div class="flex items-start gap-3 bg-red-50 border border-red-200 rounded-xl px-4 py-3">
+              <svg class="w-4 h-4 text-red-400 flex-shrink-0 mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="8" y2="12"/><line x1="12" x2="12.01" y1="16" y2="16"/>
+              </svg>
+              <p class="text-red-600 text-sm">{{ modalError() }}</p>
+            </div>
+          }
+
+          <!-- Mensagem -->
+          <div>
+            <label class="block text-sm font-medium text-slate-700 mb-1.5">
+              Mensagem para a transportadora
+              <span class="text-slate-400 font-normal">(opcional)</span>
+            </label>
+            <textarea
+              [ngModel]="modalMessage()"
+              (ngModelChange)="modalMessage.set($event)"
+              rows="3"
+              placeholder="Ex: Tenho experiência com esse tipo de carga e disponibilidade imediata..."
+              class="flex w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-xs outline-none focus:ring-[3px] focus:ring-ring/50 focus:border-ring resize-none placeholder:text-muted-foreground"
+            ></textarea>
+          </div>
+
+          <!-- Valor proposto -->
+          <div>
+            <label class="block text-sm font-medium text-slate-700 mb-1.5">
+              Valor proposto (R$)
+              <span class="text-slate-400 font-normal">(opcional)</span>
+            </label>
+            <input
+              hlmInput
+              type="number"
+              step="0.01"
+              min="0"
+              placeholder="Ex: 3500.00"
+              [ngModel]="modalValue()"
+              (ngModelChange)="modalValue.set($event)"
+              class="w-full"
+            />
+          </div>
+
+          <!-- Botões -->
+          <div class="flex gap-3 pt-2">
+            <button hlmBtn variant="outline" class="flex-1 font-semibold" (click)="fecharModal()">
+              Cancelar
+            </button>
+            <button hlmBtn class="flex-1 font-semibold" (click)="confirmarInteresse()" [disabled]="submitting()">
+              @if (submitting()) {
+                <svg class="w-4 h-4 animate-spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M21 12a9 9 0 1 1-6.219-8.56"/>
+                </svg>
+                Enviando...
+              } @else {
+                Confirmar interesse
+              }
+            </button>
+          </div>
+        </div>
+      }
+    </div>
+  </div>
+}

@@ -46,8 +46,14 @@ export const routes: Routes = [
       import('./pages/auth/nova-senha/nova-senha').then((m) => m.NovaSenhaComponent),
   },
 
-  // ── Redirecionar rota antiga ──────────────────────────────────────────────
-  { path: 'cadastrar-caminhao', redirectTo: 'cadastro/caminhoneiro', pathMatch: 'full' },
+  // ── Cadastrar caminhão (rota inteligente: redireciona por role) ───────────
+  {
+    path: 'cadastrar-caminhao',
+    loadComponent: () =>
+      import('./pages/cadastrar-caminhao/cadastrar-caminhao').then(
+        (m) => m.CadastrarCaminhaoComponent,
+      ),
+  },
 
   // ── Área do Caminhoneiro ──────────────────────────────────────────────────
   {

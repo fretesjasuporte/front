@@ -96,20 +96,22 @@
 > Substituir dados mockados por dados reais da API.
 
 ### 3.1 Cargas Disponíveis (`/cargas-disponiveis`)
-- [ ] Integrar com `GET /loads` (substituir mock)
-- [ ] Filtros passados como query params (`origin_state`, `destination_state`, `cargo_type`, `truck_type_id`)
-- [ ] Paginação com "Carregar mais"
-- [ ] Botão "Tenho interesse" → `POST /loads/:id/request`
-- [ ] Modal de confirmação com campo de mensagem e valor proposto
-- [ ] Tratar erros específicos: `CAMINHONEIRO_NAO_APROVADO`, `CAMINHAO_NAO_CADASTRADO`, `JA_SOLICITADO`
+- [x] Integrar com `GET /loads` (substituir mock)
+- [x] Filtros passados como query params (`origin_state`, `destination_state`, `cargo_type`, `truck_type_id`)
+- [x] Paginação com "Carregar mais"
+- [x] Botão "Tenho interesse" → `POST /loads/:id/request`
+- [x] Modal de confirmação com campo de mensagem e valor proposto
+- [x] Tratar erros específicos: `CAMINHONEIRO_NAO_APROVADO`, `CAMINHAO_NAO_CADASTRADO`, `JA_SOLICITADO`
+- [x] Login gate para usuários não autenticados
 
 ### 3.2 Cadastrar Caminhão
-- [ ] Redirecionar para `/cadastro/caminhoneiro` se não autenticado
-- [ ] Se autenticado como trucker → ir para `PUT /truckers/me/truck`
-- [ ] Selects de tipo de caminhão carregados de `GET /catalog/truck-types`
-- [ ] Selects de carroceria carregados de `GET /catalog/truck-types/:id/body-types`
+- [x] Redirecionar para `/cadastro/caminhoneiro` se não autenticado
+- [x] Se autenticado como trucker → `PUT /truckers/me/truck` (upsert — cria ou atualiza)
+- [x] Selects de tipo de caminhão carregados de `GET /catalog/truck-types`
+- [x] Selects de carroceria carregados de `GET /catalog/truck-types/:id/body-types`
+- [x] Pré-preenchimento com dados existentes (`GET /truckers/me/truck`)
 
-**Status: 🔲 Pendente**
+**Status: ✅ Concluída**
 
 ---
 
