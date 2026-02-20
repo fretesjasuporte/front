@@ -29,6 +29,167 @@ export interface ApiError {
   };
 }
 
+export interface LoadAddress {
+  city: string;
+  state: string;
+  zip_code?: string;
+  street?: string;
+  number?: string;
+  neighborhood?: string;
+}
+
+export interface Load {
+  id: string;
+  title: string;
+  status: 'draft' | 'published' | 'in_progress' | 'completed' | 'cancelled';
+  origin: LoadAddress;
+  destination: LoadAddress;
+  cargo_type: string;
+  weight_kg: number;
+  freight_value: number;
+  featured: boolean;
+  featured_until: string | null;
+  truck_type?: { id: string; name: string };
+  body_type?: { id: string; name: string };
+  pickup_date?: string;
+  estimated_delivery_date?: string;
+  notes?: string;
+  carrier: { id: string; legal_name: string; trade_name?: string };
+  created_at: string;
+}
+
+export interface FreightRequest {
+  id: string;
+  status: 'requested' | 'approved' | 'scheduled' | 'in_transit' | 'completed' | 'cancelled';
+  trucker_message?: string;
+  agreed_value?: number;
+  cancellation_reason?: string | null;
+  load?: Load;
+  trucker?: {
+    id: string;
+    cpf: string;
+    driver_license_category: string;
+    profile: { name: string; phone: string };
+    truck?: {
+      license_plate: string;
+      brand?: string;
+      model?: string;
+      truck_type?: { name: string };
+      body_type?: { name: string };
+    };
+  };
+  created_at: string;
+}
+
+export interface TruckerDocument {
+  id: string;
+  trucker_id: string;
+  type: 'driver_license' | 'vehicle_registration' | 'proof_of_address' | 'profile_photo' | 'other';
+  status: 'pending' | 'approved' | 'rejected' | 'expired';
+  expiry_date?: string;
+  notes?: string;
+  rejection_reason?: string | null;
+  reviewed_at?: string | null;
+  signed_url: string;
+  created_at: string;
+}
+
+export interface TruckerProfile {
+  id: string;
+  cpf: string;
+  birth_date?: string;
+  driver_license_number: string;
+  driver_license_category: string;
+  driver_license_expiry: string;
+  approval_status: 'pending' | 'approved' | 'rejected';
+  profile: {
+    id: string;
+    name: string;
+    email: string;
+    phone: string;
+  };
+  created_at: string;
+}
+
+export interface CarrierAddress {
+  street?: string;
+  number?: string;
+  complement?: string;
+  neighborhood?: string;
+  city?: string;
+  state?: string;
+  zip_code?: string;
+}
+
+export interface CarrierProfile {
+  id: string;
+  cnpj: string;
+  legal_name: string;
+  trade_name?: string;
+  business_email?: string;
+  address?: CarrierAddress;
+  profile: {
+    name: string;
+    phone: string;
+    active: boolean;
+  };
+  created_at: string;
+}
+
+export interface TruckData {
+  id: string;
+  license_plate: string;
+  manufacture_year?: number;
+  brand?: string;
+  model?: string;
+  capacity_kg?: number;
+  renavam?: string;
+  truck_type?: { id: string; name: string };
+  body_type?: { id: string; name: string };
+  created_at: string;
+}
+
+export interface AdminUser {
+  id: string;
+  email: string;
+  name: string;
+  phone?: string;
+  active: boolean;
+  role: 'admin' | 'operator';
+  created_at: string;
+}
+
+export interface TruckType {
+  id: string;
+  name: string;
+  description?: string;
+  active: boolean;
+}
+
+export interface BodyType {
+  id: string;
+  name: string;
+  description?: string;
+  active: boolean;
+}
+
+export interface SupportTicket {
+  id: string;
+  subject: string;
+  message: string;
+  reply: string | null;
+  status: 'open' | 'in_progress' | 'closed';
+  replied_at: string | null;
+  user?: {
+    id: string;
+    name: string;
+    email: string;
+    role: string;
+  };
+  created_at: string;
+  updated_at: string;
+}
+
 @Injectable({ providedIn: 'root' })
 export class ApiService {
   private readonly http = inject(HttpClient);

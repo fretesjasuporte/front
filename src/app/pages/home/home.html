@@ -54,7 +54,7 @@
           <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" x2="19" y1="8" y2="14"/><line x1="22" x2="16" y1="11" y2="11"/>
           </svg>
-          Cadastrar caminhão
+          Solicite seu cadastro
         </a>
       </div>
 
@@ -162,6 +162,104 @@
         }
       }
     </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════ CADASTRO ═══════════════════════ -->
+<section class="py-24 bg-white">
+  <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="text-center mb-14">
+      <span class="text-primary text-sm font-semibold tracking-widest uppercase">Faça parte da plataforma</span>
+      <h2 class="text-3xl sm:text-4xl font-bold text-slate-900 mt-3">Solicite seu cadastro</h2>
+      <p class="text-slate-500 mt-4 text-lg max-w-xl mx-auto leading-relaxed">
+        Selecione o seu perfil e comece a usar a plataforma em poucos minutos.
+      </p>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+      <!-- Card: Caminhoneiro -->
+      <a
+        routerLink="/cadastro/caminhoneiro"
+        class="group flex flex-col rounded-3xl border-2 border-slate-200 bg-white p-8 hover:border-primary hover:shadow-xl hover:shadow-primary/10 transition-all duration-300 cursor-pointer"
+      >
+        <div class="w-16 h-16 rounded-2xl bg-primary/8 flex items-center justify-center mb-6 group-hover:bg-primary/15 transition-colors">
+          <svg class="w-9 h-9 text-primary" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+            <path d="M3 4a1 1 0 0 1 1-1h12a1 1 0 0 1 .894.553L19.382 7H21a1 1 0 0 1 1 1v6a1 1 0 0 1-1 1h-1.17A3 3 0 0 1 14 17H10a3 3 0 0 1-5.83-2H4a1 1 0 0 1-1-1V4zm14.382 3-1.5-3H5v9h.17A3 3 0 0 1 10 11h4a3 3 0 0 1 4.83 2H21V9h-2a1 1 0 0 1-.894-.553L17.382 7zM8 15a1 1 0 1 0 0 2 1 1 0 0 0 0-2zm6 0a1 1 0 1 0 0 2 1 1 0 0 0 0-2z"/>
+          </svg>
+        </div>
+
+        <h3 class="text-2xl font-bold text-slate-900 mb-3">Sou Caminhoneiro</h3>
+        <p class="text-slate-500 leading-relaxed mb-8 flex-1">
+          Cadastre seu caminhão, envie seus documentos e comece a receber
+          ofertas de frete de transportadoras parceiras em todo o Brasil.
+        </p>
+
+        <ul class="space-y-2 mb-8">
+          @for (item of ['Acesso a cargas disponíveis', 'Solicitação de frete em 1 clique', 'Acompanhe seus fretes em tempo real']; track item) {
+            <li class="flex items-center gap-2 text-sm text-slate-600">
+              <svg class="w-4 h-4 text-brand-green flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <path d="M20 6 9 17l-5-5"/>
+              </svg>
+              {{ item }}
+            </li>
+          }
+        </ul>
+
+        <div class="flex items-center justify-between pt-4 border-t border-slate-100">
+          <span class="text-sm font-semibold text-primary group-hover:underline">Criar conta de motorista</span>
+          <div class="w-9 h-9 rounded-full bg-primary/8 flex items-center justify-center group-hover:bg-primary transition-all">
+            <svg class="w-4 h-4 text-primary group-hover:text-white transition-colors" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M5 12h14M12 5l7 7-7 7"/>
+            </svg>
+          </div>
+        </div>
+      </a>
+
+      <!-- Card: Transportadora -->
+      <a
+        routerLink="/cadastro/transportadora"
+        class="group flex flex-col rounded-3xl border-2 border-slate-200 bg-white p-8 hover:border-brand-green hover:shadow-xl hover:shadow-brand-green/10 transition-all duration-300 cursor-pointer"
+      >
+        <div class="w-16 h-16 rounded-2xl bg-brand-green/8 flex items-center justify-center mb-6 group-hover:bg-brand-green/15 transition-colors">
+          <svg class="w-9 h-9 text-brand-green" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/>
+          </svg>
+        </div>
+
+        <h3 class="text-2xl font-bold text-slate-900 mb-3">Sou Transportadora</h3>
+        <p class="text-slate-500 leading-relaxed mb-8 flex-1">
+          Cadastre sua empresa, publique suas cargas e encontre motoristas
+          qualificados e verificados para fazer suas entregas com segurança.
+        </p>
+
+        <ul class="space-y-2 mb-8">
+          @for (item of ['Publique e gerencie suas cargas', 'Receba solicitações de motoristas', 'Aprove ou recuse com facilidade']; track item) {
+            <li class="flex items-center gap-2 text-sm text-slate-600">
+              <svg class="w-4 h-4 text-brand-green flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <path d="M20 6 9 17l-5-5"/>
+              </svg>
+              {{ item }}
+            </li>
+          }
+        </ul>
+
+        <div class="flex items-center justify-between pt-4 border-t border-slate-100">
+          <span class="text-sm font-semibold text-brand-green group-hover:underline">Criar conta de transportadora</span>
+          <div class="w-9 h-9 rounded-full bg-brand-green/8 flex items-center justify-center group-hover:bg-brand-green transition-all">
+            <svg class="w-4 h-4 text-brand-green group-hover:text-white transition-colors" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M5 12h14M12 5l7 7-7 7"/>
+            </svg>
+          </div>
+        </div>
+      </a>
+
+    </div>
+
+    <p class="text-center text-sm text-slate-400 mt-8">
+      Já tem conta?
+      <a routerLink="/login" class="text-primary font-semibold hover:underline ml-1">Entrar na plataforma</a>
+    </p>
   </div>
 </section>
 

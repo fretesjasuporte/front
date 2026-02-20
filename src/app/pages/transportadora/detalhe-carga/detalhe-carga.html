@@ -1,0 +1,390 @@
+<!-- Loading -->
+@if (loading()) {
+  <div class="pt-20 min-h-screen bg-slate-50 flex items-center justify-center">
+    <div class="flex flex-col items-center gap-4 text-slate-500">
+      <svg class="w-8 h-8 animate-spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M21 12a9 9 0 1 1-6.219-8.56"/>
+      </svg>
+      <span class="text-sm">Carregando carga...</span>
+    </div>
+  </div>
+} @else if (error()) {
+  <div class="pt-20 min-h-screen bg-slate-50 flex items-center justify-center">
+    <div class="text-center">
+      <p class="text-slate-600 mb-4">{{ error() }}</p>
+      <a routerLink="/transportadora/cargas" hlmBtn variant="outline">Voltar para minhas cargas</a>
+    </div>
+  </div>
+} @else if (carga()) {
+  <!-- Header -->
+  <div class="pt-20 bg-slate-950">
+    <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <a routerLink="/transportadora/cargas" class="inline-flex items-center gap-2 text-slate-400 hover:text-white text-sm mb-6 transition-colors">
+        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M19 12H5M12 19l-7-7 7-7"/>
+        </svg>
+        Minhas cargas
+      </a>
+
+      <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
+        <div class="flex-1 min-w-0">
+          <div class="flex items-center gap-3 flex-wrap mb-2">
+            <span class="text-xs font-medium px-2.5 py-1 rounded-full border" [class]="statusClass(carga()!.status)">
+              {{ statusLabel(carga()!.status) }}
+            </span>
+          </div>
+          <h1 class="text-3xl sm:text-4xl font-bold text-white leading-tight">{{ carga()!.title }}</h1>
+          <p class="text-slate-400 mt-2 text-sm">
+            Criada em {{ formatDate(carga()!.created_at) }}
+          </p>
+        </div>
+
+        <!-- Action bar -->
+        <div class="flex flex-wrap gap-2 flex-shrink-0">
+          @if (canViewRequests(carga()!.status)) {
+            <a
+              [routerLink]="['/transportadora/cargas', carga()!.id, 'solicitacoes']"
+              hlmBtn
+              class="font-semibold"
+            >
+              Ver solicitações
+            </a>
+          }
+          @if (canEdit(carga()!.status) && !editMode()) {
+            <button hlmBtn variant="outline" class="font-semibold border-white/20 hover:text-white hover:bg-white/10" (click)="toggleEdit()">
+              Editar
+            </button>
+          }
+          @if (canToggleStatus(carga()!.status)) {
+            <button
+              hlmBtn
+              variant="outline"
+              class="font-semibold border-white/20 hover:text-white hover:bg-white/10"
+              (click)="toggleStatus()"
+              [disabled]="togglingStatus()"
+            >
+              @if (togglingStatus()) {
+                <svg class="w-4 h-4 animate-spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M21 12a9 9 0 1 1-6.219-8.56"/>
+                </svg>
+              } @else {
+                {{ carga()!.status === 'draft' ? 'Publicar' : 'Despublicar' }}
+              }
+            </button>
+          }
+          @if (canDelete(carga()!.status)) {
+            <button
+              hlmBtn
+              variant="ghost"
+              class="text-red-400 hover:text-red-300 hover:bg-red-500/10"
+              (click)="confirmDeleteCarga()"
+              [disabled]="deleting()"
+            >
+              @if (deleting()) {
+                <svg class="w-4 h-4 animate-spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M21 12a9 9 0 1 1-6.219-8.56"/>
+                </svg>
+              } @else {
+                <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/>
+                </svg>
+                Cancelar carga
+              }
+            </button>
+          }
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Content -->
+  <section class="py-10 bg-slate-50 min-h-screen">
+    <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+
+      @if (!editMode()) {
+        <!-- View mode -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+          <!-- Main info -->
+          <div class="lg:col-span-2 space-y-6">
+
+            <!-- Rota -->
+            <div class="bg-white rounded-2xl border border-slate-200 p-6">
+              <h3 class="text-sm font-semibold text-slate-500 uppercase tracking-wide mb-4">Rota</h3>
+              <div class="flex flex-col sm:flex-row items-start sm:items-center gap-3">
+                <div class="flex-1">
+                  <p class="text-xs text-muted-foreground mb-1">Origem</p>
+                  <p class="font-semibold text-slate-900 text-lg">{{ carga()!.origin.city }}, {{ carga()!.origin.state }}</p>
+                  @if (carga()!.origin.street) {
+                    <p class="text-sm text-slate-500 mt-0.5">
+                      {{ carga()!.origin.street }}
+                      @if (carga()!.origin.number) { , {{ carga()!.origin.number }} }
+                      @if (carga()!.origin.neighborhood) { — {{ carga()!.origin.neighborhood }} }
+                    </p>
+                  }
+                </div>
+                <svg class="w-6 h-6 text-primary flex-shrink-0 rotate-90 sm:rotate-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                  <path d="M5 12h14M12 5l7 7-7 7"/>
+                </svg>
+                <div class="flex-1">
+                  <p class="text-xs text-muted-foreground mb-1">Destino</p>
+                  <p class="font-semibold text-slate-900 text-lg">{{ carga()!.destination.city }}, {{ carga()!.destination.state }}</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Carga -->
+            <div class="bg-white rounded-2xl border border-slate-200 p-6">
+              <h3 class="text-sm font-semibold text-slate-500 uppercase tracking-wide mb-4">Dados da carga</h3>
+              <div class="grid grid-cols-2 sm:grid-cols-3 gap-6">
+                <div>
+                  <p class="text-xs text-muted-foreground mb-1">Tipo de carga</p>
+                  <p class="font-semibold text-slate-900">{{ carga()!.cargo_type }}</p>
+                </div>
+                <div>
+                  <p class="text-xs text-muted-foreground mb-1">Peso</p>
+                  <p class="font-semibold text-slate-900">{{ carga()!.weight_kg.toLocaleString('pt-BR') }} kg</p>
+                </div>
+                <div>
+                  <p class="text-xs text-muted-foreground mb-1">Valor do frete</p>
+                  <p class="font-bold text-xl text-primary">{{ formatValue(carga()!.freight_value) }}</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Observações -->
+            @if (carga()!.notes) {
+              <div class="bg-white rounded-2xl border border-slate-200 p-6">
+                <h3 class="text-sm font-semibold text-slate-500 uppercase tracking-wide mb-3">Observações</h3>
+                <p class="text-slate-700 text-sm leading-relaxed">{{ carga()!.notes }}</p>
+              </div>
+            }
+          </div>
+
+          <!-- Sidebar -->
+          <div class="space-y-6">
+
+            <!-- Requisitos de veículo -->
+            <div class="bg-white rounded-2xl border border-slate-200 p-6">
+              <h3 class="text-sm font-semibold text-slate-500 uppercase tracking-wide mb-4">Veículo necessário</h3>
+              @if (carga()!.truck_type) {
+                <div class="space-y-3">
+                  <div>
+                    <p class="text-xs text-muted-foreground mb-1">Tipo de caminhão</p>
+                    <p class="font-semibold text-slate-900">{{ carga()!.truck_type!.name }}</p>
+                  </div>
+                  @if (carga()!.body_type) {
+                    <div>
+                      <p class="text-xs text-muted-foreground mb-1">Carroceria</p>
+                      <p class="font-semibold text-slate-900">{{ carga()!.body_type!.name }}</p>
+                    </div>
+                  }
+                </div>
+              } @else {
+                <p class="text-slate-500 text-sm">Qualquer tipo de caminhão</p>
+              }
+            </div>
+
+            <!-- Datas -->
+            <div class="bg-white rounded-2xl border border-slate-200 p-6">
+              <h3 class="text-sm font-semibold text-slate-500 uppercase tracking-wide mb-4">Datas</h3>
+              <div class="space-y-3">
+                <div>
+                  <p class="text-xs text-muted-foreground mb-1">Data de coleta</p>
+                  <p class="font-semibold text-slate-900">{{ carga()!.pickup_date ? formatDate(carga()!.pickup_date!) : 'Não definida' }}</p>
+                </div>
+                <div>
+                  <p class="text-xs text-muted-foreground mb-1">Previsão de entrega</p>
+                  <p class="font-semibold text-slate-900">{{ carga()!.estimated_delivery_date ? formatDate(carga()!.estimated_delivery_date!) : 'Não definida' }}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      } @else {
+        <!-- Edit mode -->
+        <div class="max-w-4xl">
+          <div class="flex items-center justify-between mb-6">
+            <h2 class="text-lg font-semibold text-slate-900">Editando carga</h2>
+            <button hlmBtn variant="ghost" size="sm" (click)="toggleEdit()">Cancelar edição</button>
+          </div>
+
+          @if (saveError()) {
+            <div class="flex items-start gap-3 bg-red-50 border border-red-200 rounded-xl px-4 py-3 mb-6">
+              <svg class="w-4 h-4 text-red-400 flex-shrink-0 mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="8" y2="12"/><line x1="12" x2="12.01" y1="16" y2="16"/>
+              </svg>
+              <p class="text-red-600 text-sm">{{ saveError() }}</p>
+            </div>
+          }
+
+          <form [formGroup]="form" class="space-y-6">
+            <div class="bg-white rounded-2xl border border-slate-200 p-6 sm:p-8">
+              <h3 class="text-base font-semibold text-slate-900 mb-5">Dados gerais</h3>
+              <div class="grid grid-cols-1 gap-5">
+                <div>
+                  <label class="block text-sm font-medium text-slate-700 mb-1.5">Título <span class="text-destructive">*</span></label>
+                  <input hlmInput type="text" formControlName="title" class="w-full" />
+                  @if (isInvalid('title')) { <p class="text-destructive text-xs mt-1.5">Obrigatório.</p> }
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                  <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-1.5">Tipo de carga <span class="text-destructive">*</span></label>
+                    <input hlmInput type="text" formControlName="cargo_type" class="w-full" />
+                    @if (isInvalid('cargo_type')) { <p class="text-destructive text-xs mt-1.5">Obrigatório.</p> }
+                  </div>
+                  <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-1.5">Peso (kg) <span class="text-destructive">*</span></label>
+                    <input hlmInput type="number" min="1" formControlName="weight_kg" class="w-full" />
+                    @if (isInvalid('weight_kg')) { <p class="text-destructive text-xs mt-1.5">Obrigatório.</p> }
+                  </div>
+                  <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-1.5">Valor do frete (R$) <span class="text-destructive">*</span></label>
+                    <input hlmInput type="number" min="1" step="0.01" formControlName="freight_value" class="w-full" />
+                    @if (isInvalid('freight_value')) { <p class="text-destructive text-xs mt-1.5">Obrigatório.</p> }
+                  </div>
+                  <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-1.5">Observações</label>
+                    <textarea
+                      formControlName="notes"
+                      rows="2"
+                      class="flex w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-xs outline-none focus:ring-[3px] focus:ring-ring/50 focus:border-ring resize-none"
+                    ></textarea>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+              <div class="bg-white rounded-2xl border border-slate-200 p-6">
+                <h3 class="text-base font-semibold text-slate-900 mb-4">Origem</h3>
+                <div class="grid grid-cols-1 gap-4">
+                  <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-1.5">Cidade <span class="text-destructive">*</span></label>
+                    <input hlmInput type="text" formControlName="origin_city" class="w-full" />
+                  </div>
+                  <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-1.5">Estado <span class="text-destructive">*</span></label>
+                    <select formControlName="origin_state" class="flex h-10 w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-xs outline-none focus:ring-[3px] focus:ring-ring/50 focus:border-ring">
+                      <option value="">Selecione...</option>
+                      @for (estado of estados; track estado.uf) {
+                        <option [value]="estado.uf">{{ estado.uf }} — {{ estado.nome }}</option>
+                      }
+                    </select>
+                  </div>
+                  <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-1.5">CEP</label>
+                    <input hlmInput type="text" formControlName="origin_zip_code" class="w-full" />
+                  </div>
+                </div>
+              </div>
+              <div class="bg-white rounded-2xl border border-slate-200 p-6">
+                <h3 class="text-base font-semibold text-slate-900 mb-4">Destino</h3>
+                <div class="grid grid-cols-1 gap-4">
+                  <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-1.5">Cidade <span class="text-destructive">*</span></label>
+                    <input hlmInput type="text" formControlName="destination_city" class="w-full" />
+                  </div>
+                  <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-1.5">Estado <span class="text-destructive">*</span></label>
+                    <select formControlName="destination_state" class="flex h-10 w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-xs outline-none focus:ring-[3px] focus:ring-ring/50 focus:border-ring">
+                      <option value="">Selecione...</option>
+                      @for (estado of estados; track estado.uf) {
+                        <option [value]="estado.uf">{{ estado.uf }} — {{ estado.nome }}</option>
+                      }
+                    </select>
+                  </div>
+                  <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-1.5">CEP</label>
+                    <input hlmInput type="text" formControlName="destination_zip_code" class="w-full" />
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="bg-white rounded-2xl border border-slate-200 p-6">
+              <h3 class="text-base font-semibold text-slate-900 mb-4">Veículo e datas</h3>
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                <div>
+                  <label class="block text-sm font-medium text-slate-700 mb-1.5">Tipo de caminhão</label>
+                  <select
+                    formControlName="truck_type_id"
+                    (change)="onTruckTypeChange(form.get('truck_type_id')?.value || null)"
+                    class="flex h-10 w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-xs outline-none focus:ring-[3px] focus:ring-ring/50 focus:border-ring"
+                  >
+                    <option value="">Qualquer tipo</option>
+                    @for (tipo of truckTypes(); track tipo.id) {
+                      <option [value]="tipo.id">{{ tipo.name }}</option>
+                    }
+                  </select>
+                </div>
+                <div>
+                  <label class="block text-sm font-medium text-slate-700 mb-1.5">Carroceria</label>
+                  <select
+                    formControlName="body_type_id"
+                    [disabled]="bodyTypes().length === 0"
+                    class="flex h-10 w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-xs outline-none focus:ring-[3px] focus:ring-ring/50 focus:border-ring disabled:opacity-50"
+                  >
+                    <option value="">{{ bodyTypes().length === 0 ? 'Selecione um tipo' : 'Qualquer carroceria' }}</option>
+                    @for (body of bodyTypes(); track body.id) {
+                      <option [value]="body.id">{{ body.name }}</option>
+                    }
+                  </select>
+                </div>
+                <div>
+                  <label class="block text-sm font-medium text-slate-700 mb-1.5">Data de coleta</label>
+                  <input hlmInput type="date" formControlName="pickup_date" class="w-full" />
+                </div>
+                <div>
+                  <label class="block text-sm font-medium text-slate-700 mb-1.5">Previsão de entrega</label>
+                  <input hlmInput type="date" formControlName="estimated_delivery_date" class="w-full" />
+                </div>
+              </div>
+            </div>
+
+            <div class="flex justify-end gap-3 pb-10">
+              <button hlmBtn variant="ghost" type="button" (click)="toggleEdit()">Cancelar</button>
+              <button hlmBtn type="button" [disabled]="saving()" (click)="saveEdit()" class="font-semibold">
+                @if (saving()) {
+                  <svg class="w-4 h-4 animate-spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 12a9 9 0 1 1-6.219-8.56"/>
+                  </svg>
+                  Salvando...
+                } @else {
+                  Salvar alterações
+                }
+              </button>
+            </div>
+          </form>
+        </div>
+      }
+    </div>
+  </section>
+}
+
+<!-- Modal delete confirm -->
+@if (confirmDelete()) {
+  <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm" (click)="cancelDeleteCarga()">
+    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-6" (click)="$event.stopPropagation()">
+      <div class="flex items-center gap-3 mb-4">
+        <div class="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center flex-shrink-0">
+          <svg class="w-5 h-5 text-red-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="8" y2="12"/><line x1="12" x2="12.01" y1="16" y2="16"/>
+          </svg>
+        </div>
+        <div>
+          <h3 class="text-base font-semibold text-slate-900">Cancelar carga</h3>
+          <p class="text-sm text-muted-foreground">Esta ação não pode ser desfeita.</p>
+        </div>
+      </div>
+      <p class="text-sm text-slate-600 mb-6">
+        Todas as solicitações pendentes associadas a esta carga também serão canceladas.
+      </p>
+      <div class="flex gap-3">
+        <button hlmBtn variant="outline" class="flex-1" (click)="cancelDeleteCarga()">Voltar</button>
+        <button hlmBtn variant="destructive" class="flex-1 font-semibold" (click)="deleteCarga()">Sim, cancelar</button>
+      </div>
+    </div>
+  </div>
+}

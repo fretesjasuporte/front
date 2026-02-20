@@ -1,18 +1,18 @@
 import { Component, inject, OnInit, signal } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { ApiService, SupportTicket } from '../../../core/services/api.service';
+import { ApiService, SupportTicket } from '../../core/services/api.service';
 import { HlmButton } from '@spartan-ng/helm/button';
 import { HlmBadge } from '@spartan-ng/helm/badge';
-
+import { HlmInput } from '@spartan-ng/helm/input';
 
 @Component({
-  selector: 'app-admin-suporte',
+  selector: 'app-suporte',
   standalone: true,
-  imports: [FormsModule, DatePipe, HlmButton, HlmBadge],
+  imports: [FormsModule, DatePipe, HlmButton, HlmBadge, HlmInput],
   templateUrl: './suporte.html',
 })
-export class AdminSuporteComponent implements OnInit {
+export class SuporteComponent implements OnInit {
   private readonly api = inject(ApiService);
 
   readonly loading = signal(true);
@@ -22,13 +22,14 @@ export class AdminSuporteComponent implements OnInit {
   readonly total = signal(0);
   readonly error = signal<string | null>(null);
 
-  filterStatus = 'open';
+  filterStatus = '';
 
-  readonly replyModal = signal<SupportTicket | null>(null);
-  replyText = '';
-  replyStatus: 'in_progress' | 'closed' = 'closed';
-  readonly saving = signal(false);
-  readonly saveError = signal<string | null>(null);
+  readonly showForm = signal(false);
+  newSubject = '';
+  newMessage = '';
+  readonly submitting = signal(false);
+  readonly submitError = signal<string | null>(null);
+  readonly submitSuccess = signal(false);
 
   private currentPage = 1;
 
@@ -50,7 +51,7 @@ export class AdminSuporteComponent implements OnInit {
     };
     if (this.filterStatus) params['status'] = this.filterStatus;
 
-    this.api.getPaginated<SupportTicket>('admin/support/tickets', params).subscribe({
+    this.api.getPaginated<SupportTicket>('support/tickets/mine', params).subscribe({
       next: (res) => {
         if (reset) {
           this.tickets.set(res.data);
@@ -79,41 +80,38 @@ export class AdminSuporteComponent implements OnInit {
     this.load(false);
   }
 
-  openReply(ticket: SupportTicket): void {
-    this.replyText = ticket.reply ?? '';
-    this.replyStatus = ticket.status === 'open' ? 'in_progress' : 'closed';
-    this.saveError.set(null);
-    this.replyModal.set(ticket);
+  toggleForm(): void {
+    this.showForm.update((v) => !v);
+    this.submitError.set(null);
+    this.submitSuccess.set(false);
   }
 
-  saveReply(): void {
-    const ticket = this.replyModal();
-    if (!ticket) return;
+  openTicket(): void {
+    if (!this.newSubject.trim() || !this.newMessage.trim()) return;
 
-    this.saving.set(true);
-    this.saveError.set(null);
+    this.submitting.set(true);
+    this.submitError.set(null);
 
-    const body: Record<string, string> = { status: this.replyStatus };
-    if (this.replyText.trim()) body['reply'] = this.replyText.trim();
-
-    this.api.patch<SupportTicket>(`admin/support/tickets/${ticket.id}`, body).subscribe({
-      next: (res) => {
-        this.tickets.update((t) =>
-          t.map((i) => (i.id === ticket.id ? { ...i, ...res.data } : i)),
-        );
-        this.saving.set(false);
-        this.replyModal.set(null);
-      },
-      error: (err) => {
-        const code = err?.error?.error?.code;
-        this.saveError.set(
-          code === 'TICKET_FECHADO'
-            ? 'Este chamado já está encerrado.'
-            : 'Erro ao atualizar chamado.',
-        );
-        this.saving.set(false);
-      },
-    });
+    this.api
+      .post<SupportTicket>('support/tickets', {
+        subject: this.newSubject.trim(),
+        message: this.newMessage.trim(),
+      })
+      .subscribe({
+        next: (res) => {
+          this.tickets.update((t) => [res.data, ...t]);
+          this.total.update((v) => v + 1);
+          this.newSubject = '';
+          this.newMessage = '';
+          this.submitting.set(false);
+          this.submitSuccess.set(true);
+          this.showForm.set(false);
+        },
+        error: (err) => {
+          this.submitError.set(err?.error?.error?.message || 'Erro ao abrir chamado.');
+          this.submitting.set(false);
+        },
+      });
   }
 
   statusClass(status: string): 'default' | 'secondary' | 'destructive' | 'outline' {
@@ -132,15 +130,5 @@ export class AdminSuporteComponent implements OnInit {
       closed: 'Encerrado',
     };
     return map[status] ?? status;
-  }
-
-  roleLabel(role: string): string {
-    const map: Record<string, string> = {
-      trucker: 'Motorista',
-      carrier: 'Transportadora',
-      admin: 'Admin',
-      operator: 'Operador',
-    };
-    return map[role] ?? role;
   }
 }

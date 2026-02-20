@@ -1,0 +1,335 @@
+<!-- Header -->
+<div class="pt-20 bg-slate-950">
+  <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+    <a routerLink="/transportadora/cargas" class="inline-flex items-center gap-2 text-slate-400 hover:text-white text-sm mb-6 transition-colors">
+      <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M19 12H5M12 19l-7-7 7-7"/>
+      </svg>
+      Minhas cargas
+    </a>
+    <!-- <span class="text-brand-green text-sm font-semibold tracking-widest uppercase">Transportadora</span> -->
+    <h1 class="text-4xl font-bold text-white mt-3 leading-tight">Nova carga</h1>
+    <p class="text-slate-300 text-lg mt-3 leading-relaxed">
+      Preencha os dados da carga. Você pode salvar como rascunho e publicar depois.
+    </p>
+  </div>
+</div>
+
+<!-- Success screen -->
+@if (submitted()) {
+  <section class="py-20 bg-slate-50 min-h-screen">
+    <div class="max-w-lg mx-auto px-4 text-center">
+      <div class="w-20 h-20 rounded-full bg-green-100 flex items-center justify-center mx-auto mb-6">
+        <svg class="w-10 h-10 text-green-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M20 6 9 17l-5-5"/>
+        </svg>
+      </div>
+      <h2 class="text-2xl font-bold text-slate-900 mb-3">Carga criada com sucesso!</h2>
+      <p class="text-slate-600 mb-8">
+        Sua carga foi salva. Acesse "Minhas cargas" para gerenciá-la e acompanhar as solicitações dos motoristas.
+      </p>
+      <div class="flex flex-col sm:flex-row gap-3 justify-center">
+        <a routerLink="/transportadora/cargas" hlmBtn class="font-semibold">Ver minhas cargas</a>
+        @if (createdLoadId()) {
+          <a [routerLink]="['/transportadora/cargas', createdLoadId()]" hlmBtn variant="outline" class="font-semibold">Ver detalhes da carga</a>
+        }
+      </div>
+    </div>
+  </section>
+
+} @else {
+  <!-- Form -->
+  <section class="py-10 bg-slate-50 min-h-screen">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+      <form [formGroup]="form" class="space-y-8">
+
+        @if (errorMessage()) {
+          <div class="flex items-start gap-3 bg-red-50 border border-red-200 rounded-xl px-4 py-3">
+            <svg class="w-4 h-4 text-red-400 flex-shrink-0 mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="8" y2="12"/><line x1="12" x2="12.01" y1="16" y2="16"/>
+            </svg>
+            <p class="text-red-600 text-sm">{{ errorMessage() }}</p>
+          </div>
+        }
+
+        <!-- Dados gerais -->
+        <div class="bg-white rounded-2xl border border-slate-200 p-6 sm:p-8">
+          <h2 class="text-lg font-semibold text-slate-900 mb-6 flex items-center gap-2">
+            <span class="w-7 h-7 rounded-lg bg-primary/10 flex items-center justify-center text-primary text-xs font-bold">1</span>
+            Dados gerais
+          </h2>
+          <div class="grid grid-cols-1 gap-5">
+            <div>
+              <label for="title" class="block text-sm font-medium text-slate-700 mb-1.5">
+                Título da carga <span class="text-destructive">*</span>
+              </label>
+              <input
+                hlmInput
+                id="title"
+                type="text"
+                formControlName="title"
+                placeholder="Ex: Carga de eletrônicos SP → RJ"
+                class="w-full"
+              />
+              @if (isInvalid('title')) {
+                <p class="text-destructive text-xs mt-1.5">Informe um título para a carga.</p>
+              }
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+              <div>
+                <label for="cargo_type" class="block text-sm font-medium text-slate-700 mb-1.5">
+                  Tipo de carga <span class="text-destructive">*</span>
+                </label>
+                <input
+                  hlmInput
+                  id="cargo_type"
+                  type="text"
+                  formControlName="cargo_type"
+                  placeholder="Ex: Eletrônicos, Alimentos..."
+                  class="w-full"
+                />
+                @if (isInvalid('cargo_type')) {
+                  <p class="text-destructive text-xs mt-1.5">Informe o tipo de carga.</p>
+                }
+              </div>
+              <div>
+                <label for="weight_kg" class="block text-sm font-medium text-slate-700 mb-1.5">
+                  Peso (kg) <span class="text-destructive">*</span>
+                </label>
+                <input
+                  hlmInput
+                  id="weight_kg"
+                  type="number"
+                  min="1"
+                  formControlName="weight_kg"
+                  placeholder="Ex: 5000"
+                  class="w-full"
+                />
+                @if (isInvalid('weight_kg')) {
+                  <p class="text-destructive text-xs mt-1.5">Informe o peso em kg (mínimo 1).</p>
+                }
+              </div>
+            </div>
+
+            <div>
+              <label for="freight_value" class="block text-sm font-medium text-slate-700 mb-1.5">
+                Valor do frete (R$) <span class="text-destructive">*</span>
+              </label>
+              <input
+                hlmInput
+                id="freight_value"
+                type="number"
+                min="1"
+                step="0.01"
+                formControlName="freight_value"
+                placeholder="Ex: 3500.00"
+                class="w-full"
+              />
+              @if (isInvalid('freight_value')) {
+                <p class="text-destructive text-xs mt-1.5">Informe o valor do frete.</p>
+              }
+            </div>
+
+            <div>
+              <label for="notes" class="block text-sm font-medium text-slate-700 mb-1.5">
+                Observações <span class="text-slate-400 font-normal">(opcional)</span>
+              </label>
+              <textarea
+                id="notes"
+                formControlName="notes"
+                rows="3"
+                placeholder="Ex: Carga frágil, manusear com cuidado..."
+                class="flex w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-xs outline-none focus:ring-[3px] focus:ring-ring/50 focus:border-ring resize-none placeholder:text-muted-foreground"
+              ></textarea>
+            </div>
+          </div>
+        </div>
+
+        <!-- Origem -->
+        <div class="bg-white rounded-2xl border border-slate-200 p-6 sm:p-8">
+          <h2 class="text-lg font-semibold text-slate-900 mb-6 flex items-center gap-2">
+            <span class="w-7 h-7 rounded-lg bg-primary/10 flex items-center justify-center text-primary text-xs font-bold">2</span>
+            Local de coleta (origem)
+          </h2>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+            <div>
+              <label for="origin_city" class="block text-sm font-medium text-slate-700 mb-1.5">
+                Cidade <span class="text-destructive">*</span>
+              </label>
+              <input hlmInput id="origin_city" type="text" formControlName="origin_city" placeholder="São Paulo" class="w-full" />
+              @if (isInvalid('origin_city')) {
+                <p class="text-destructive text-xs mt-1.5">Informe a cidade de origem.</p>
+              }
+            </div>
+            <div>
+              <label for="origin_state" class="block text-sm font-medium text-slate-700 mb-1.5">
+                Estado <span class="text-destructive">*</span>
+              </label>
+              <select
+                id="origin_state"
+                formControlName="origin_state"
+                class="flex h-10 w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-xs outline-none focus:ring-[3px] focus:ring-ring/50 focus:border-ring"
+              >
+                <option value="">Selecione...</option>
+                @for (estado of estados; track estado.uf) {
+                  <option [value]="estado.uf">{{ estado.uf }} — {{ estado.nome }}</option>
+                }
+              </select>
+              @if (isInvalid('origin_state')) {
+                <p class="text-destructive text-xs mt-1.5">Selecione o estado de origem.</p>
+              }
+            </div>
+            <div>
+              <label for="origin_zip_code" class="block text-sm font-medium text-slate-700 mb-1.5">CEP</label>
+              <input hlmInput id="origin_zip_code" type="text" formControlName="origin_zip_code" placeholder="00000000" class="w-full" />
+            </div>
+            <div>
+              <label for="origin_neighborhood" class="block text-sm font-medium text-slate-700 mb-1.5">Bairro</label>
+              <input hlmInput id="origin_neighborhood" type="text" formControlName="origin_neighborhood" placeholder="Centro" class="w-full" />
+            </div>
+            <div>
+              <label for="origin_street" class="block text-sm font-medium text-slate-700 mb-1.5">Logradouro</label>
+              <input hlmInput id="origin_street" type="text" formControlName="origin_street" placeholder="Av. Paulista" class="w-full" />
+            </div>
+            <div>
+              <label for="origin_number" class="block text-sm font-medium text-slate-700 mb-1.5">Número</label>
+              <input hlmInput id="origin_number" type="text" formControlName="origin_number" placeholder="1000" class="w-full" />
+            </div>
+          </div>
+        </div>
+
+        <!-- Destino -->
+        <div class="bg-white rounded-2xl border border-slate-200 p-6 sm:p-8">
+          <h2 class="text-lg font-semibold text-slate-900 mb-6 flex items-center gap-2">
+            <span class="w-7 h-7 rounded-lg bg-primary/10 flex items-center justify-center text-primary text-xs font-bold">3</span>
+            Local de entrega (destino)
+          </h2>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+            <div>
+              <label for="destination_city" class="block text-sm font-medium text-slate-700 mb-1.5">
+                Cidade <span class="text-destructive">*</span>
+              </label>
+              <input hlmInput id="destination_city" type="text" formControlName="destination_city" placeholder="Rio de Janeiro" class="w-full" />
+              @if (isInvalid('destination_city')) {
+                <p class="text-destructive text-xs mt-1.5">Informe a cidade de destino.</p>
+              }
+            </div>
+            <div>
+              <label for="destination_state" class="block text-sm font-medium text-slate-700 mb-1.5">
+                Estado <span class="text-destructive">*</span>
+              </label>
+              <select
+                id="destination_state"
+                formControlName="destination_state"
+                class="flex h-10 w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-xs outline-none focus:ring-[3px] focus:ring-ring/50 focus:border-ring"
+              >
+                <option value="">Selecione...</option>
+                @for (estado of estados; track estado.uf) {
+                  <option [value]="estado.uf">{{ estado.uf }} — {{ estado.nome }}</option>
+                }
+              </select>
+              @if (isInvalid('destination_state')) {
+                <p class="text-destructive text-xs mt-1.5">Selecione o estado de destino.</p>
+              }
+            </div>
+            <div>
+              <label for="destination_zip_code" class="block text-sm font-medium text-slate-700 mb-1.5">CEP</label>
+              <input hlmInput id="destination_zip_code" type="text" formControlName="destination_zip_code" placeholder="00000000" class="w-full" />
+            </div>
+          </div>
+        </div>
+
+        <!-- Requisitos e datas -->
+        <div class="bg-white rounded-2xl border border-slate-200 p-6 sm:p-8">
+          <h2 class="text-lg font-semibold text-slate-900 mb-6 flex items-center gap-2">
+            <span class="w-7 h-7 rounded-lg bg-primary/10 flex items-center justify-center text-primary text-xs font-bold">4</span>
+            Veículo e datas <span class="text-slate-400 text-sm font-normal">(opcional)</span>
+          </h2>
+
+          @if (loadingCatalog()) {
+            <div class="flex items-center gap-3 text-slate-500 text-sm py-4">
+              <svg class="w-4 h-4 animate-spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 12a9 9 0 1 1-6.219-8.56"/>
+              </svg>
+              Carregando catálogo...
+            </div>
+          } @else {
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+              <div>
+                <label for="truck_type_id" class="block text-sm font-medium text-slate-700 mb-1.5">Tipo de caminhão</label>
+                <select
+                  id="truck_type_id"
+                  formControlName="truck_type_id"
+                  (change)="onTruckTypeChange(form.get('truck_type_id')?.value || null)"
+                  class="flex h-10 w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-xs outline-none focus:ring-[3px] focus:ring-ring/50 focus:border-ring"
+                >
+                  <option value="">Qualquer tipo</option>
+                  @for (tipo of truckTypes(); track tipo.id) {
+                    <option [value]="tipo.id">{{ tipo.name }}</option>
+                  }
+                </select>
+              </div>
+              <div>
+                <label for="body_type_id" class="block text-sm font-medium text-slate-700 mb-1.5">Tipo de carroceria</label>
+                <select
+                  id="body_type_id"
+                  formControlName="body_type_id"
+                  [disabled]="bodyTypes().length === 0"
+                  class="flex h-10 w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-xs outline-none focus:ring-[3px] focus:ring-ring/50 focus:border-ring disabled:opacity-50"
+                >
+                  <option value="">{{ bodyTypes().length === 0 ? 'Selecione um tipo de caminhão' : 'Qualquer carroceria' }}</option>
+                  @for (body of bodyTypes(); track body.id) {
+                    <option [value]="body.id">{{ body.name }}</option>
+                  }
+                </select>
+              </div>
+              <div>
+                <label for="pickup_date" class="block text-sm font-medium text-slate-700 mb-1.5">Data de coleta</label>
+                <input hlmInput id="pickup_date" type="date" formControlName="pickup_date" class="w-full" />
+              </div>
+              <div>
+                <label for="estimated_delivery_date" class="block text-sm font-medium text-slate-700 mb-1.5">Previsão de entrega</label>
+                <input hlmInput id="estimated_delivery_date" type="date" formControlName="estimated_delivery_date" class="w-full" />
+              </div>
+            </div>
+          }
+        </div>
+
+        <!-- Actions -->
+        <div class="flex flex-col sm:flex-row gap-3 justify-end pb-10">
+          <a routerLink="/transportadora/cargas" hlmBtn variant="ghost" class="font-semibold">Cancelar</a>
+          <button
+            hlmBtn
+            variant="outline"
+            type="button"
+            [disabled]="loading()"
+            (click)="onSubmit(false)"
+            class="font-semibold"
+          >
+            @if (loading()) {
+              <svg class="w-4 h-4 animate-spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 12a9 9 0 1 1-6.219-8.56"/>
+              </svg>
+            }
+            Salvar rascunho
+          </button>
+          <button
+            hlmBtn
+            type="button"
+            [disabled]="loading()"
+            (click)="onSubmit(true)"
+            class="font-semibold"
+          >
+            @if (loading()) {
+              <svg class="w-4 h-4 animate-spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 12a9 9 0 1 1-6.219-8.56"/>
+              </svg>
+            }
+            Salvar e publicar
+          </button>
+        </div>
+      </form>
+    </div>
+  </section>
+}

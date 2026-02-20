@@ -46,6 +46,14 @@ export const routes: Routes = [
       import('./pages/auth/nova-senha/nova-senha').then((m) => m.NovaSenhaComponent),
   },
 
+  // ── Suporte (qualquer usuário autenticado) ────────────────────────────────
+  {
+    path: 'suporte',
+    canActivate: [authGuard],
+    loadComponent: () =>
+      import('./pages/suporte/suporte').then((m) => m.SuporteComponent),
+  },
+
   // ── Cadastrar caminhão (rota inteligente: redireciona por role) ───────────
   {
     path: 'cadastrar-caminhao',

@@ -1,0 +1,242 @@
+<!-- Loading -->
+@if (loading()) {
+  <div class="pt-20 min-h-screen bg-slate-50 flex items-center justify-center">
+    <div class="flex flex-col items-center gap-4 text-slate-500">
+      <svg class="w-8 h-8 animate-spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M21 12a9 9 0 1 1-6.219-8.56"/>
+      </svg>
+      <span class="text-sm">Carregando solicitações...</span>
+    </div>
+  </div>
+} @else if (error()) {
+  <div class="pt-20 min-h-screen bg-slate-50 flex items-center justify-center">
+    <div class="text-center">
+      <p class="text-slate-600 mb-4">{{ error() }}</p>
+      <a routerLink="/transportadora/cargas" hlmBtn variant="outline">Voltar para minhas cargas</a>
+    </div>
+  </div>
+} @else {
+  <!-- Header -->
+  <div class="pt-20 bg-slate-950">
+    <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <a [routerLink]="['/transportadora/cargas', loadId()]" class="inline-flex items-center gap-2 text-slate-400 hover:text-white text-sm mb-6 transition-colors">
+        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M19 12H5M12 19l-7-7 7-7"/>
+        </svg>
+        Detalhes da carga
+      </a>
+
+      <!-- <span class="text-brand-green text-sm font-semibold tracking-widest uppercase">Transportadora</span> -->
+      <h1 class="text-3xl sm:text-4xl font-bold text-white mt-3 leading-tight">Solicitações de frete</h1>
+
+      @if (carga()) {
+        <div class="mt-4 flex items-center gap-2 text-slate-300 text-sm">
+          <span class="font-medium text-white">{{ carga()!.origin.city }}, {{ carga()!.origin.state }}</span>
+          <svg class="w-4 h-4 text-primary" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <path d="M5 12h14M12 5l7 7-7 7"/>
+          </svg>
+          <span class="font-medium text-white">{{ carga()!.destination.city }}, {{ carga()!.destination.state }}</span>
+          <span class="text-slate-500">·</span>
+          <span>{{ solicitacoes().length }} solicitação(ões)</span>
+        </div>
+      }
+    </div>
+  </div>
+
+  <!-- Content -->
+  <section class="py-10 bg-slate-50 min-h-screen">
+    <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+
+      @if (solicitacoes().length === 0) {
+        <div class="flex flex-col items-center justify-center py-24 text-center">
+          <div class="w-20 h-20 rounded-2xl bg-slate-200 flex items-center justify-center mb-5">
+            <svg class="w-10 h-10 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/>
+              <path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/>
+            </svg>
+          </div>
+          <h3 class="text-xl font-semibold text-slate-700 mb-2">Nenhuma solicitação ainda</h3>
+          <p class="text-slate-500 text-sm max-w-xs leading-relaxed">
+            Motoristas ainda não demonstraram interesse nessa carga. As solicitações aparecerão aqui assim que chegarem.
+          </p>
+        </div>
+      } @else {
+        <div class="space-y-4">
+          @for (sol of solicitacoes(); track sol.id) {
+            <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-xs hover:shadow-sm transition-shadow">
+              <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
+
+                <!-- Trucker info -->
+                <div class="flex-1">
+                  <div class="flex items-center gap-3 mb-3">
+                    <div class="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
+                      <svg class="w-5 h-5 text-primary" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
+                      </svg>
+                    </div>
+                    <div>
+                      <p class="font-semibold text-slate-900">{{ sol.trucker?.profile?.name ?? 'Motorista' }}</p>
+                      <p class="text-xs text-muted-foreground">{{ sol.trucker?.profile?.phone ?? '' }}</p>
+                    </div>
+                    <span hlmBadge [variant]="freightStatusClass(sol.status)" class="ml-auto sm:ml-0">
+                      {{ freightStatusLabel(sol.status) }}
+                    </span>
+                  </div>
+
+                  <div class="grid grid-cols-2 sm:grid-cols-3 gap-4 mb-4 text-sm">
+                    @if (sol.trucker?.driver_license_category) {
+                      <div>
+                        <p class="text-xs text-muted-foreground mb-0.5">CNH</p>
+                        <p class="font-medium text-slate-800">Categoria {{ sol.trucker!.driver_license_category }}</p>
+                      </div>
+                    }
+                    @if (sol.trucker?.truck?.license_plate) {
+                      <div>
+                        <p class="text-xs text-muted-foreground mb-0.5">Placa</p>
+                        <p class="font-medium text-slate-800 uppercase">{{ sol.trucker!.truck!.license_plate }}</p>
+                      </div>
+                    }
+                    @if (sol.trucker?.truck?.truck_type) {
+                      <div>
+                        <p class="text-xs text-muted-foreground mb-0.5">Tipo de caminhão</p>
+                        <p class="font-medium text-slate-800">
+                          {{ sol.trucker!.truck!.truck_type!.name }}
+                          @if (sol.trucker!.truck!.body_type) { — {{ sol.trucker!.truck!.body_type!.name }} }
+                        </p>
+                      </div>
+                    }
+                    @if (sol.agreed_value) {
+                      <div>
+                        <p class="text-xs text-muted-foreground mb-0.5">Valor proposto</p>
+                        <p class="font-bold text-primary">{{ formatValue(sol.agreed_value) }}</p>
+                      </div>
+                    }
+                    <div>
+                      <p class="text-xs text-muted-foreground mb-0.5">Solicitado em</p>
+                      <p class="font-medium text-slate-800">{{ formatDate(sol.created_at) }}</p>
+                    </div>
+                  </div>
+
+                  @if (sol.trucker_message) {
+                    <div class="bg-slate-50 rounded-xl px-4 py-3 border border-slate-100">
+                      <p class="text-xs text-muted-foreground mb-1">Mensagem do motorista</p>
+                      <p class="text-sm text-slate-700 leading-relaxed">{{ sol.trucker_message }}</p>
+                    </div>
+                  }
+
+                  @if (sol.cancellation_reason) {
+                    <div class="bg-red-50 rounded-xl px-4 py-3 border border-red-100 mt-3">
+                      <p class="text-xs text-red-500 mb-1">Motivo da recusa</p>
+                      <p class="text-sm text-red-700 leading-relaxed">{{ sol.cancellation_reason }}</p>
+                    </div>
+                  }
+                </div>
+
+                <!-- Actions -->
+                @if (sol.status === 'requested') {
+                  <div class="flex sm:flex-col gap-2 sm:min-w-[120px]">
+                    <button
+                      hlmBtn
+                      class="flex-1 font-semibold bg-green-600 hover:bg-green-700 text-white"
+                      (click)="openConfirm(sol.id, 'approved')"
+                      [disabled]="processingId() === sol.id"
+                    >
+                      @if (processingId() === sol.id) {
+                        <svg class="w-4 h-4 animate-spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                          <path d="M21 12a9 9 0 1 1-6.219-8.56"/>
+                        </svg>
+                      } @else {
+                        Aprovar
+                      }
+                    </button>
+                    <button
+                      hlmBtn
+                      variant="outline"
+                      class="flex-1 font-semibold text-red-600 border-red-200 hover:bg-red-50"
+                      (click)="openConfirm(sol.id, 'cancelled')"
+                      [disabled]="processingId() === sol.id"
+                    >
+                      Recusar
+                    </button>
+                  </div>
+                }
+              </div>
+            </div>
+          }
+        </div>
+      }
+    </div>
+  </section>
+}
+
+<!-- Modal confirmação -->
+@if (confirmModal()) {
+  <div
+    class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
+    (click)="closeModal()"
+  >
+    <div
+      class="bg-white rounded-2xl shadow-2xl w-full max-w-sm"
+      (click)="$event.stopPropagation()"
+    >
+      <div class="p-6 border-b border-slate-100">
+        <h3 class="text-base font-semibold text-slate-900">
+          {{ confirmModal()!.action === 'approved' ? 'Aprovar motorista' : 'Recusar solicitação' }}
+        </h3>
+        <p class="text-sm text-muted-foreground mt-1">
+          @if (confirmModal()!.action === 'approved') {
+            As demais solicitações desta carga serão canceladas automaticamente.
+          } @else {
+            O motorista será notificado sobre a recusa.
+          }
+        </p>
+      </div>
+
+      <div class="p-6">
+        @if (actionError()) {
+          <div class="flex items-start gap-3 bg-red-50 border border-red-200 rounded-xl px-4 py-3 mb-4">
+            <svg class="w-4 h-4 text-red-400 flex-shrink-0 mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="8" y2="12"/><line x1="12" x2="12.01" y1="16" y2="16"/>
+            </svg>
+            <p class="text-red-600 text-sm">{{ actionError() }}</p>
+          </div>
+        }
+
+        @if (confirmModal()!.action === 'cancelled') {
+          <div class="mb-5">
+            <label class="block text-sm font-medium text-slate-700 mb-1.5">
+              Motivo da recusa <span class="text-destructive">*</span>
+            </label>
+            <textarea
+              [ngModel]="rejectionReason()"
+              (ngModelChange)="rejectionReason.set($event)"
+              rows="3"
+              placeholder="Ex: O veículo não atende aos requisitos da carga..."
+              class="flex w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-xs outline-none focus:ring-[3px] focus:ring-ring/50 focus:border-ring resize-none placeholder:text-muted-foreground"
+            ></textarea>
+          </div>
+        }
+
+        <div class="flex gap-3">
+          <button hlmBtn variant="outline" class="flex-1" (click)="closeModal()">Cancelar</button>
+          <button
+            hlmBtn
+            class="flex-1 font-semibold"
+            [class]="confirmModal()!.action === 'approved' ? 'bg-green-600 hover:bg-green-700 text-white' : ''"
+            [variant]="confirmModal()!.action === 'cancelled' ? 'destructive' : 'default'"
+            (click)="confirmarAcao()"
+            [disabled]="processingId() !== null"
+          >
+            @if (processingId() !== null) {
+              <svg class="w-4 h-4 animate-spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 12a9 9 0 1 1-6.219-8.56"/>
+              </svg>
+            } @else {
+              {{ confirmModal()!.action === 'approved' ? 'Confirmar aprovação' : 'Confirmar recusa' }}
+            }
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+}

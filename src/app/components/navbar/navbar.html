@@ -8,7 +8,7 @@
     <div class="flex items-center justify-between h-16 lg:h-20">
 
       <!-- Logo -->
-      <a routerLink="/" (click)="closeMenu()" class="flex items-center gap-2.5 group">
+      <a routerLink="/" (click)="closeMenu()" class="flex items-center gap-2.5 group flex-shrink-0">
         <div class="w-9 h-9 rounded-xl bg-primary flex items-center justify-center shadow-sm group-hover:bg-primary/90 transition-colors">
           <svg class="w-5 h-5 text-white" viewBox="0 0 24 24" fill="currentColor">
             <path d="M3 4a1 1 0 0 1 1-1h12a1 1 0 0 1 .894.553L19.382 7H21a1 1 0 0 1 1 1v6a1 1 0 0 1-1 1h-1.17A3 3 0 0 1 14 17H10a3 3 0 0 1-5.83-2H4a1 1 0 0 1-1-1V4zm14.382 3-1.5-3H5v9h.17A3 3 0 0 1 10 11h4a3 3 0 0 1 4.83 2H21V9h-2a1 1 0 0 1-.894-.553L17.382 7zM8 15a1 1 0 1 0 0 2 1 1 0 0 0 0-2zm6 0a1 1 0 1 0 0 2 1 1 0 0 0 0-2z"/>
@@ -24,37 +24,111 @@
 
       <!-- Desktop Nav -->
       <nav class="hidden lg:flex items-center gap-1">
-        <a
-          routerLink="/"
-          routerLinkActive="text-primary font-semibold"
-          [routerLinkActiveOptions]="{ exact: true }"
-          class="px-4 py-2 rounded-lg text-sm font-medium transition-colors hover:bg-white/10"
-          [class]="scrolled() ? 'text-slate-700 hover:bg-slate-100 hover:text-slate-900' : 'text-slate-200 hover:text-white'"
-        >
-          Início
-        </a>
-        <a
-          routerLink="/cargas-disponiveis"
-          routerLinkActive="text-primary font-semibold"
-          class="px-4 py-2 rounded-lg text-sm font-medium transition-colors"
-          [class]="scrolled() ? 'text-slate-700 hover:bg-slate-100 hover:text-slate-900' : 'text-slate-200 hover:text-white hover:bg-white/10'"
-        >
-          Cargas Disponíveis
-        </a>
-        <a
-          routerLink="/cadastrar-caminhao"
-          routerLinkActive="text-primary font-semibold"
-          class="px-4 py-2 rounded-lg text-sm font-medium transition-colors"
-          [class]="scrolled() ? 'text-slate-700 hover:bg-slate-100 hover:text-slate-900' : 'text-slate-200 hover:text-white hover:bg-white/10'"
-        >
-          Cadastrar Caminhão
-        </a>
+
+        @if (!auth.isAuthenticated()) {
+          <!-- Visitante -->
+          <a routerLink="/" routerLinkActive="text-primary font-semibold"
+            [routerLinkActiveOptions]="{ exact: true }"
+            class="px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+            [class]="scrolled() ? 'text-slate-700 hover:bg-slate-100 hover:text-slate-900' : 'text-slate-200 hover:text-white hover:bg-white/10'">
+            Início
+          </a>
+          <a routerLink="/cargas-disponiveis" routerLinkActive="text-primary font-semibold"
+            class="px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+            [class]="scrolled() ? 'text-slate-700 hover:bg-slate-100 hover:text-slate-900' : 'text-slate-200 hover:text-white hover:bg-white/10'">
+            Cargas Disponíveis
+          </a>
+
+        } @else if (auth.userRole() === 'trucker') {
+          <!-- Motorista -->
+          <a routerLink="/motorista/dashboard" routerLinkActive="text-primary font-semibold"
+            class="px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+            [class]="scrolled() ? 'text-slate-700 hover:bg-slate-100 hover:text-slate-900' : 'text-slate-200 hover:text-white hover:bg-white/10'">
+            Dashboard
+          </a>
+          <a routerLink="/cargas-disponiveis" routerLinkActive="text-primary font-semibold"
+            class="px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+            [class]="scrolled() ? 'text-slate-700 hover:bg-slate-100 hover:text-slate-900' : 'text-slate-200 hover:text-white hover:bg-white/10'">
+            Cargas
+          </a>
+          <a routerLink="/motorista/fretes" routerLinkActive="text-primary font-semibold"
+            class="px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+            [class]="scrolled() ? 'text-slate-700 hover:bg-slate-100 hover:text-slate-900' : 'text-slate-200 hover:text-white hover:bg-white/10'">
+            Meus Fretes
+          </a>
+          <a routerLink="/motorista/documentos" routerLinkActive="text-primary font-semibold"
+            class="px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+            [class]="scrolled() ? 'text-slate-700 hover:bg-slate-100 hover:text-slate-900' : 'text-slate-200 hover:text-white hover:bg-white/10'">
+            Documentos
+          </a>
+          <a routerLink="/motorista/perfil" routerLinkActive="text-primary font-semibold"
+            class="px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+            [class]="scrolled() ? 'text-slate-700 hover:bg-slate-100 hover:text-slate-900' : 'text-slate-200 hover:text-white hover:bg-white/10'">
+            Perfil
+          </a>
+          <a routerLink="/suporte" routerLinkActive="text-primary font-semibold"
+            class="px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+            [class]="scrolled() ? 'text-slate-700 hover:bg-slate-100 hover:text-slate-900' : 'text-slate-200 hover:text-white hover:bg-white/10'">
+            Suporte
+          </a>
+
+        } @else if (auth.userRole() === 'carrier') {
+          <!-- Transportadora -->
+          <a routerLink="/transportadora/dashboard" routerLinkActive="text-primary font-semibold"
+            class="px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+            [class]="scrolled() ? 'text-slate-700 hover:bg-slate-100 hover:text-slate-900' : 'text-slate-200 hover:text-white hover:bg-white/10'">
+            Dashboard
+          </a>
+          <a routerLink="/transportadora/cargas" routerLinkActive="text-primary font-semibold"
+            class="px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+            [class]="scrolled() ? 'text-slate-700 hover:bg-slate-100 hover:text-slate-900' : 'text-slate-200 hover:text-white hover:bg-white/10'">
+            Minhas Cargas
+          </a>
+          <a routerLink="/transportadora/perfil" routerLinkActive="text-primary font-semibold"
+            class="px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+            [class]="scrolled() ? 'text-slate-700 hover:bg-slate-100 hover:text-slate-900' : 'text-slate-200 hover:text-white hover:bg-white/10'">
+            Perfil
+          </a>
+          <a routerLink="/suporte" routerLinkActive="text-primary font-semibold"
+            class="px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+            [class]="scrolled() ? 'text-slate-700 hover:bg-slate-100 hover:text-slate-900' : 'text-slate-200 hover:text-white hover:bg-white/10'">
+            Suporte
+          </a>
+
+        } @else if (auth.userRole() === 'admin' || auth.userRole() === 'operator') {
+          <!-- Admin / Operator -->
+          <a routerLink="/admin/caminhoneiros" routerLinkActive="text-primary font-semibold"
+            class="px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+            [class]="scrolled() ? 'text-slate-700 hover:bg-slate-100 hover:text-slate-900' : 'text-slate-200 hover:text-white hover:bg-white/10'">
+            Caminhoneiros
+          </a>
+          <a routerLink="/admin/documentos" routerLinkActive="text-primary font-semibold"
+            class="px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+            [class]="scrolled() ? 'text-slate-700 hover:bg-slate-100 hover:text-slate-900' : 'text-slate-200 hover:text-white hover:bg-white/10'">
+            Documentos
+          </a>
+          <a routerLink="/admin/catalogo" routerLinkActive="text-primary font-semibold"
+            class="px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+            [class]="scrolled() ? 'text-slate-700 hover:bg-slate-100 hover:text-slate-900' : 'text-slate-200 hover:text-white hover:bg-white/10'">
+            Catálogo
+          </a>
+          <a routerLink="/admin/suporte" routerLinkActive="text-primary font-semibold"
+            class="px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+            [class]="scrolled() ? 'text-slate-700 hover:bg-slate-100 hover:text-slate-900' : 'text-slate-200 hover:text-white hover:bg-white/10'">
+            Suporte
+          </a>
+          <a routerLink="/admin/usuarios" routerLinkActive="text-primary font-semibold"
+            class="px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+            [class]="scrolled() ? 'text-slate-700 hover:bg-slate-100 hover:text-slate-900' : 'text-slate-200 hover:text-white hover:bg-white/10'">
+            Usuários
+          </a>
+        }
+
       </nav>
 
       <!-- Desktop CTA -->
-      <div class="hidden lg:flex items-center gap-3">
+      <div class="hidden lg:flex items-center gap-3 flex-shrink-0">
         @if (auth.isAuthenticated()) {
-          <!-- Usuário logado -->
           <span
             class="text-sm font-medium transition-colors"
             [class]="scrolled() ? 'text-slate-700' : 'text-slate-200'"
@@ -68,13 +142,9 @@
             Sair
           </button>
         } @else {
-          <!-- Visitante -->
-          <a
-            routerLink="/login"
-            hlmBtn variant="ghost" size="sm"
+          <a routerLink="/login" hlmBtn variant="ghost" size="sm"
             class="font-semibold"
-            [class]="scrolled() ? 'text-slate-700 hover:bg-slate-100' : 'text-slate-200 hover:text-white hover:bg-white/10'"
-          >
+            [class]="scrolled() ? 'text-slate-700 hover:bg-slate-100' : 'text-slate-200 hover:text-white hover:bg-white/10'">
             Entrar
           </a>
           <a routerLink="/cadastro/caminhoneiro" hlmBtn size="sm" class="font-semibold">
@@ -107,31 +177,87 @@
   @if (mobileMenuOpen()) {
     <div class="lg:hidden bg-white border-t border-slate-200 shadow-lg animate-in slide-in-from-top-2 duration-200">
       <nav class="max-w-7xl mx-auto px-4 py-4 flex flex-col gap-1">
-        <a
-          routerLink="/"
-          routerLinkActive="text-primary font-semibold bg-primary/5"
-          [routerLinkActiveOptions]="{ exact: true }"
-          (click)="closeMenu()"
-          class="px-4 py-3 rounded-xl text-slate-700 text-sm font-medium hover:bg-slate-100 transition-colors"
-        >
-          Início
-        </a>
-        <a
-          routerLink="/cargas-disponiveis"
-          routerLinkActive="text-primary font-semibold bg-primary/5"
-          (click)="closeMenu()"
-          class="px-4 py-3 rounded-xl text-slate-700 text-sm font-medium hover:bg-slate-100 transition-colors"
-        >
-          Cargas Disponíveis
-        </a>
-        <a
-          routerLink="/cadastrar-caminhao"
-          routerLinkActive="text-primary font-semibold bg-primary/5"
-          (click)="closeMenu()"
-          class="px-4 py-3 rounded-xl text-slate-700 text-sm font-medium hover:bg-slate-100 transition-colors"
-        >
-          Cadastrar Caminhão
-        </a>
+
+        @if (!auth.isAuthenticated()) {
+          <a routerLink="/" routerLinkActive="text-primary font-semibold bg-primary/5"
+            [routerLinkActiveOptions]="{ exact: true }" (click)="closeMenu()"
+            class="px-4 py-3 rounded-xl text-slate-700 text-sm font-medium hover:bg-slate-100 transition-colors">
+            Início
+          </a>
+          <a routerLink="/cargas-disponiveis" routerLinkActive="text-primary font-semibold bg-primary/5"
+            (click)="closeMenu()"
+            class="px-4 py-3 rounded-xl text-slate-700 text-sm font-medium hover:bg-slate-100 transition-colors">
+            Cargas Disponíveis
+          </a>
+
+        } @else if (auth.userRole() === 'trucker') {
+          <a routerLink="/motorista/dashboard" routerLinkActive="text-primary font-semibold bg-primary/5"
+            (click)="closeMenu()" class="px-4 py-3 rounded-xl text-slate-700 text-sm font-medium hover:bg-slate-100 transition-colors">
+            Dashboard
+          </a>
+          <a routerLink="/cargas-disponiveis" routerLinkActive="text-primary font-semibold bg-primary/5"
+            (click)="closeMenu()" class="px-4 py-3 rounded-xl text-slate-700 text-sm font-medium hover:bg-slate-100 transition-colors">
+            Cargas Disponíveis
+          </a>
+          <a routerLink="/motorista/fretes" routerLinkActive="text-primary font-semibold bg-primary/5"
+            (click)="closeMenu()" class="px-4 py-3 rounded-xl text-slate-700 text-sm font-medium hover:bg-slate-100 transition-colors">
+            Meus Fretes
+          </a>
+          <a routerLink="/motorista/documentos" routerLinkActive="text-primary font-semibold bg-primary/5"
+            (click)="closeMenu()" class="px-4 py-3 rounded-xl text-slate-700 text-sm font-medium hover:bg-slate-100 transition-colors">
+            Documentos
+          </a>
+          <a routerLink="/motorista/perfil" routerLinkActive="text-primary font-semibold bg-primary/5"
+            (click)="closeMenu()" class="px-4 py-3 rounded-xl text-slate-700 text-sm font-medium hover:bg-slate-100 transition-colors">
+            Perfil
+          </a>
+          <a routerLink="/suporte" routerLinkActive="text-primary font-semibold bg-primary/5"
+            (click)="closeMenu()" class="px-4 py-3 rounded-xl text-slate-700 text-sm font-medium hover:bg-slate-100 transition-colors">
+            Suporte
+          </a>
+
+        } @else if (auth.userRole() === 'carrier') {
+          <a routerLink="/transportadora/dashboard" routerLinkActive="text-primary font-semibold bg-primary/5"
+            (click)="closeMenu()" class="px-4 py-3 rounded-xl text-slate-700 text-sm font-medium hover:bg-slate-100 transition-colors">
+            Dashboard
+          </a>
+          <a routerLink="/transportadora/cargas" routerLinkActive="text-primary font-semibold bg-primary/5"
+            (click)="closeMenu()" class="px-4 py-3 rounded-xl text-slate-700 text-sm font-medium hover:bg-slate-100 transition-colors">
+            Minhas Cargas
+          </a>
+          <a routerLink="/transportadora/perfil" routerLinkActive="text-primary font-semibold bg-primary/5"
+            (click)="closeMenu()" class="px-4 py-3 rounded-xl text-slate-700 text-sm font-medium hover:bg-slate-100 transition-colors">
+            Perfil
+          </a>
+          <a routerLink="/suporte" routerLinkActive="text-primary font-semibold bg-primary/5"
+            (click)="closeMenu()" class="px-4 py-3 rounded-xl text-slate-700 text-sm font-medium hover:bg-slate-100 transition-colors">
+            Suporte
+          </a>
+
+        } @else if (auth.userRole() === 'admin' || auth.userRole() === 'operator') {
+          <a routerLink="/admin/caminhoneiros" routerLinkActive="text-primary font-semibold bg-primary/5"
+            (click)="closeMenu()" class="px-4 py-3 rounded-xl text-slate-700 text-sm font-medium hover:bg-slate-100 transition-colors">
+            Caminhoneiros
+          </a>
+          <a routerLink="/admin/documentos" routerLinkActive="text-primary font-semibold bg-primary/5"
+            (click)="closeMenu()" class="px-4 py-3 rounded-xl text-slate-700 text-sm font-medium hover:bg-slate-100 transition-colors">
+            Documentos
+          </a>
+          <a routerLink="/admin/catalogo" routerLinkActive="text-primary font-semibold bg-primary/5"
+            (click)="closeMenu()" class="px-4 py-3 rounded-xl text-slate-700 text-sm font-medium hover:bg-slate-100 transition-colors">
+            Catálogo
+          </a>
+          <a routerLink="/admin/suporte" routerLinkActive="text-primary font-semibold bg-primary/5"
+            (click)="closeMenu()" class="px-4 py-3 rounded-xl text-slate-700 text-sm font-medium hover:bg-slate-100 transition-colors">
+            Suporte
+          </a>
+          <a routerLink="/admin/usuarios" routerLinkActive="text-primary font-semibold bg-primary/5"
+            (click)="closeMenu()" class="px-4 py-3 rounded-xl text-slate-700 text-sm font-medium hover:bg-slate-100 transition-colors">
+            Usuários
+          </a>
+        }
+
+        <!-- Ações -->
         <div class="pt-2 mt-2 border-t border-slate-100 flex flex-col gap-2">
           @if (auth.isAuthenticated()) {
             <div class="px-4 py-2 text-sm font-medium text-slate-500">

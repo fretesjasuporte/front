@@ -1,0 +1,266 @@
+<!-- Header -->
+<div class="pt-20 bg-slate-950">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+    <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-6">
+      <div>
+        <span class="text-brand-green text-sm font-semibold tracking-widest uppercase">Motorista</span>
+        <h1 class="text-4xl sm:text-5xl font-bold text-white mt-3 leading-tight">Meus fretes</h1>
+        <p class="text-slate-300 text-lg mt-3 leading-relaxed max-w-xl">
+          Acompanhe suas solicitações e fretes em andamento.
+        </p>
+      </div>
+      <a routerLink="/cargas-disponiveis" hlmBtn size="lg" class="font-semibold flex-shrink-0 self-start sm:self-auto">
+        Buscar cargas
+      </a>
+    </div>
+  </div>
+</div>
+
+<!-- Filters -->
+<div class="sticky top-16 lg:top-20 z-40 bg-white border-b border-slate-200 shadow-sm">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+    <div class="flex flex-col sm:flex-row gap-3 items-start sm:items-center">
+      <select
+        [ngModel]="filterStatus()"
+        (ngModelChange)="filterStatus.set($event)"
+        class="flex h-9 rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-xs outline-none focus:ring-[3px] focus:ring-ring/50 focus:border-ring min-w-[200px]"
+      >
+        <option value="">Todos os status</option>
+        <option value="requested">Aguardando resposta</option>
+        <option value="approved">Aprovados</option>
+        <option value="scheduled">Agendados</option>
+        <option value="in_transit">Em trânsito</option>
+        <option value="completed">Concluídos</option>
+        <option value="cancelled">Cancelados</option>
+      </select>
+
+      <div class="flex items-center gap-2 flex-shrink-0">
+        <button hlmBtn size="sm" (click)="applyFilters()" class="font-semibold">Buscar</button>
+        @if (filterStatus()) {
+          <button hlmBtn variant="ghost" size="sm" (click)="filterStatus.set(''); applyFilters()" class="text-slate-500">
+            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M18 6 6 18M6 6l12 12"/>
+            </svg>
+            Limpar
+          </button>
+        }
+      </div>
+
+      @if (!loading()) {
+        <span class="text-sm text-muted-foreground sm:ml-auto">{{ total() }} frete(s)</span>
+      }
+    </div>
+  </div>
+</div>
+
+<!-- Main content -->
+<section class="py-10 bg-slate-50 min-h-screen">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+
+    @if (loading()) {
+      <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
+        @for (i of [1,2,3,4,5,6]; track i) {
+          <div class="bg-white rounded-xl border border-slate-200 p-6 animate-pulse">
+            <div class="h-4 bg-slate-200 rounded w-3/4 mb-3"></div>
+            <div class="h-3 bg-slate-100 rounded w-1/2 mb-6"></div>
+            <div class="space-y-3">
+              <div class="h-3 bg-slate-100 rounded w-full"></div>
+              <div class="h-3 bg-slate-100 rounded w-5/6"></div>
+            </div>
+            <div class="h-9 bg-slate-200 rounded mt-6"></div>
+          </div>
+        }
+      </div>
+
+    } @else if (error()) {
+      <div class="flex flex-col items-center justify-center py-24 text-center">
+        <div class="w-20 h-20 rounded-2xl bg-red-100 flex items-center justify-center mb-5">
+          <svg class="w-10 h-10 text-red-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="8" y2="12"/><line x1="12" x2="12.01" y1="16" y2="16"/>
+          </svg>
+        </div>
+        <h3 class="text-xl font-semibold text-slate-700 mb-2">Erro ao carregar</h3>
+        <p class="text-slate-500 text-sm mb-6">{{ error() }}</p>
+        <button hlmBtn (click)="applyFilters()">Tentar novamente</button>
+      </div>
+
+    } @else if (fretes().length === 0) {
+      <div class="flex flex-col items-center justify-center py-24 text-center">
+        <div class="w-20 h-20 rounded-2xl bg-slate-200 flex items-center justify-center mb-5">
+          <svg class="w-10 h-10 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <rect x="1" y="3" width="15" height="13" rx="1"/><path d="M16 8h4l3 3v5h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/>
+          </svg>
+        </div>
+        <h3 class="text-xl font-semibold text-slate-700 mb-2">Nenhum frete encontrado</h3>
+        <p class="text-slate-500 text-sm mb-6 max-w-xs leading-relaxed">
+          @if (filterStatus()) {
+            Nenhum frete com esse status. Tente outro filtro.
+          } @else {
+            Você ainda não demonstrou interesse em nenhuma carga.
+          }
+        </p>
+        <a routerLink="/cargas-disponiveis" hlmBtn>Ver cargas disponíveis</a>
+      </div>
+
+    } @else {
+      <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
+        @for (frete of fretes(); track frete.id) {
+          <div hlmCard class="hover:shadow-md transition-all duration-300 hover:-translate-y-0.5">
+
+            <div hlmCardHeader>
+              <div class="flex items-start justify-between gap-3">
+                <div class="flex-1 min-w-0">
+                  @if (frete.load) {
+                    <div class="flex items-center gap-1.5 flex-wrap">
+                      <span class="font-semibold text-slate-900 text-sm leading-tight">
+                        {{ frete.load.origin.city }}, {{ frete.load.origin.state }}
+                      </span>
+                      <svg class="w-3.5 h-3.5 text-primary flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                        <path d="M5 12h14M12 5l7 7-7 7"/>
+                      </svg>
+                      <span class="font-semibold text-slate-900 text-sm leading-tight">
+                        {{ frete.load.destination.city }}, {{ frete.load.destination.state }}
+                      </span>
+                    </div>
+                    <p class="text-xs text-muted-foreground mt-1 truncate">{{ frete.load.title }}</p>
+                  }
+                </div>
+                <span hlmBadge [variant]="freightStatusClass(frete.status)" class="flex-shrink-0">
+                  {{ freightStatusLabel(frete.status) }}
+                </span>
+              </div>
+            </div>
+
+            <div hlmCardContent>
+              <div class="space-y-3">
+                @if (frete.load) {
+                  <div class="flex items-center gap-2.5">
+                    <div class="w-7 h-7 rounded-lg bg-primary/8 flex items-center justify-center flex-shrink-0">
+                      <svg class="w-3.5 h-3.5 text-primary" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
+                      </svg>
+                    </div>
+                    <div>
+                      <p class="text-xs text-muted-foreground">Carga</p>
+                      <p class="text-sm font-medium text-slate-800">
+                        {{ frete.load.cargo_type }} · {{ frete.load.weight_kg.toLocaleString('pt-BR') }} kg
+                      </p>
+                    </div>
+                  </div>
+
+                  <div class="flex items-center gap-2.5">
+                    <div class="w-7 h-7 rounded-lg bg-primary/8 flex items-center justify-center flex-shrink-0">
+                      <svg class="w-3.5 h-3.5 text-primary" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M19 21V5a2 2 0 0 0-2-2H7a2 2 0 0 0-2 2v16"/>
+                        <path d="M1 21h22"/>
+                      </svg>
+                    </div>
+                    <div>
+                      <p class="text-xs text-muted-foreground">Transportadora</p>
+                      <p class="text-sm font-medium text-slate-800">
+                        {{ frete.load.carrier.trade_name || frete.load.carrier.legal_name }}
+                      </p>
+                    </div>
+                  </div>
+
+                  @if (frete.load.pickup_date) {
+                    <div class="flex items-center justify-between pt-2 border-t border-slate-100">
+                      <span class="text-xs text-muted-foreground">Coleta</span>
+                      <span class="text-sm font-medium text-slate-700">{{ formatDate(frete.load.pickup_date) }}</span>
+                    </div>
+                  }
+
+                  <div class="flex items-center justify-between pt-1">
+                    <span class="text-xs text-muted-foreground">Valor do frete</span>
+                    <span class="text-lg font-bold text-primary">{{ formatValue(frete.agreed_value ?? frete.load.freight_value) }}</span>
+                  </div>
+                }
+
+                @if (frete.cancellation_reason) {
+                  <div class="bg-red-50 rounded-xl px-3 py-2.5 border border-red-100">
+                    <p class="text-xs text-red-500 mb-0.5">Motivo da recusa</p>
+                    <p class="text-xs text-red-700 leading-relaxed">{{ frete.cancellation_reason }}</p>
+                  </div>
+                }
+              </div>
+            </div>
+
+            <div hlmCardFooter class="pt-0">
+              @if (canCancel(frete.status)) {
+                <button
+                  hlmBtn
+                  variant="outline"
+                  class="w-full font-semibold text-red-600 border-red-200 hover:bg-red-50"
+                  (click)="abrirConfirmCancel(frete.id)"
+                  [disabled]="cancelingId() === frete.id"
+                >
+                  @if (cancelingId() === frete.id) {
+                    <svg class="w-4 h-4 animate-spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M21 12a9 9 0 1 1-6.219-8.56"/>
+                    </svg>
+                    Cancelando...
+                  } @else {
+                    Cancelar solicitação
+                  }
+                </button>
+              } @else {
+                <div class="w-full text-center text-xs text-muted-foreground py-2">
+                  Solicitado em {{ formatDate(frete.created_at) }}
+                </div>
+              }
+            </div>
+          </div>
+        }
+      </div>
+
+      @if (hasMore()) {
+        <div class="flex justify-center mt-10">
+          <button hlmBtn variant="outline" size="lg" (click)="loadMore()" [disabled]="loadingMore()" class="font-semibold min-w-[200px]">
+            @if (loadingMore()) {
+              <svg class="w-4 h-4 animate-spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 12a9 9 0 1 1-6.219-8.56"/>
+              </svg>
+              Carregando...
+            } @else {
+              Carregar mais
+            }
+          </button>
+        </div>
+      }
+    }
+  </div>
+</section>
+
+<!-- Modal cancelamento -->
+@if (confirmCancelId()) {
+  <div
+    class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
+    (click)="fecharConfirmCancel()"
+  >
+    <div
+      class="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-6"
+      (click)="$event.stopPropagation()"
+    >
+      <div class="flex items-center gap-3 mb-4">
+        <div class="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center flex-shrink-0">
+          <svg class="w-5 h-5 text-red-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="8" y2="12"/><line x1="12" x2="12.01" y1="16" y2="16"/>
+          </svg>
+        </div>
+        <div>
+          <h3 class="text-base font-semibold text-slate-900">Cancelar solicitação</h3>
+          <p class="text-sm text-muted-foreground">Esta ação não pode ser desfeita.</p>
+        </div>
+      </div>
+      <p class="text-sm text-slate-600 mb-6">
+        Tem certeza que deseja cancelar essa solicitação de frete?
+      </p>
+      <div class="flex gap-3">
+        <button hlmBtn variant="outline" class="flex-1" (click)="fecharConfirmCancel()">Voltar</button>
+        <button hlmBtn variant="destructive" class="flex-1 font-semibold" (click)="cancelarFrete()">
+          Sim, cancelar
+        </button>
+      </div>
+    </div>
+  </div>
+}

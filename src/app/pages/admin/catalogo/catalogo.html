@@ -1,0 +1,257 @@
+<!-- Header -->
+<div class="pt-20 bg-slate-950">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+    <span class="text-brand-green text-sm font-semibold tracking-widest uppercase">Admin</span>
+    <h1 class="text-4xl sm:text-5xl font-bold text-white mt-3 leading-tight">Catálogo</h1>
+    <p class="text-slate-300 text-lg mt-3 leading-relaxed max-w-xl">
+      Gerencie os tipos de caminhão e carroceria disponíveis na plataforma.
+    </p>
+  </div>
+</div>
+
+<!-- Content -->
+<section class="py-10 bg-slate-50 min-h-screen">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+
+    <!-- Tabs -->
+    <div class="flex gap-1 bg-white border border-slate-200 rounded-xl p-1 w-fit mb-8">
+      <button
+        class="px-5 py-2 text-sm font-medium rounded-lg transition-colors"
+        [class.bg-primary]="activeTab() === 'truck'"
+        [class.text-white]="activeTab() === 'truck'"
+        [class.text-slate-600]="activeTab() !== 'truck'"
+        [class.hover:bg-slate-100]="activeTab() !== 'truck'"
+        (click)="activeTab.set('truck')"
+      >
+        Tipos de Caminhão
+      </button>
+      <button
+        class="px-5 py-2 text-sm font-medium rounded-lg transition-colors"
+        [class.bg-primary]="activeTab() === 'body'"
+        [class.text-white]="activeTab() === 'body'"
+        [class.text-slate-600]="activeTab() !== 'body'"
+        [class.hover:bg-slate-100]="activeTab() !== 'body'"
+        (click)="activeTab.set('body')"
+      >
+        Tipos de Carroceria
+      </button>
+    </div>
+
+    @if (loading()) {
+      <div class="space-y-3">
+        @for (i of [1,2,3,4]; track i) {
+          <div class="bg-white rounded-2xl border border-slate-200 p-5 animate-pulse">
+            <div class="h-4 bg-slate-200 rounded w-32 mb-2"></div>
+            <div class="h-3 bg-slate-100 rounded w-48"></div>
+          </div>
+        }
+      </div>
+    } @else if (error()) {
+      <div class="bg-red-50 border border-red-200 rounded-2xl p-6 text-center">
+        <p class="text-red-700">{{ error() }}</p>
+        <button hlmBtn variant="outline" class="mt-3" (click)="loadAll()">Tentar novamente</button>
+      </div>
+    } @else {
+
+      <!-- Truck Types Tab -->
+      @if (activeTab() === 'truck') {
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+          <!-- Add form -->
+          <div class="bg-white rounded-2xl border border-slate-200 p-5 lg:col-span-1 h-fit">
+            <h2 class="text-base font-semibold text-slate-900 mb-4">Novo tipo de caminhão</h2>
+            <div class="space-y-3">
+              <div>
+                <label class="block text-sm font-medium text-slate-700 mb-1">Nome *</label>
+                <input hlmInput type="text" [(ngModel)]="newTruckName" placeholder="Ex: Carreta"
+                  class="w-full" />
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-slate-700 mb-1">
+                  Descrição <span class="text-slate-400 font-normal">(opcional)</span>
+                </label>
+                <input hlmInput type="text" [(ngModel)]="newTruckDesc"
+                  placeholder="Breve descrição" class="w-full" />
+              </div>
+              @if (truckError()) {
+                <p class="text-sm text-red-600">{{ truckError() }}</p>
+              }
+              <button hlmBtn class="w-full" (click)="addTruckType()"
+                [disabled]="savingTruck() || !newTruckName.trim()">
+                @if (savingTruck()) { Criando... } @else { Criar tipo }
+              </button>
+            </div>
+          </div>
+
+          <!-- List -->
+          <div class="lg:col-span-2">
+            @if (!truckTypes().length) {
+              <div class="bg-white rounded-2xl border border-slate-200 p-10 text-center">
+                <p class="text-slate-500">Nenhum tipo de caminhão cadastrado.</p>
+              </div>
+            } @else {
+              <div class="space-y-3">
+                @for (item of truckTypes(); track item.id) {
+                  <div class="bg-white rounded-2xl border border-slate-200 p-4 flex items-center justify-between gap-3">
+                    <div class="flex-1 min-w-0">
+                      <div class="flex items-center gap-2">
+                        <p class="font-medium text-slate-900">{{ item.name }}</p>
+                        @if (!item.active) {
+                          <span hlmBadge [variant]="'outline'">Inativo</span>
+                        }
+                      </div>
+                      @if (item.description) {
+                        <p class="text-sm text-slate-500 mt-0.5">{{ item.description }}</p>
+                      }
+                    </div>
+                    <div class="flex gap-2 flex-shrink-0">
+                      <button hlmBtn variant="outline" size="sm" (click)="openEdit('truck', item)">
+                        Editar
+                      </button>
+                      <button hlmBtn variant="destructive" size="sm" (click)="openDelete('truck', item)">
+                        Remover
+                      </button>
+                    </div>
+                  </div>
+                }
+              </div>
+            }
+          </div>
+        </div>
+      }
+
+      <!-- Body Types Tab -->
+      @if (activeTab() === 'body') {
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+          <!-- Add form -->
+          <div class="bg-white rounded-2xl border border-slate-200 p-5 lg:col-span-1 h-fit">
+            <h2 class="text-base font-semibold text-slate-900 mb-4">Nova carroceria</h2>
+            <div class="space-y-3">
+              <div>
+                <label class="block text-sm font-medium text-slate-700 mb-1">Nome *</label>
+                <input hlmInput type="text" [(ngModel)]="newBodyName" placeholder="Ex: Baú"
+                  class="w-full" />
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-slate-700 mb-1">
+                  Descrição <span class="text-slate-400 font-normal">(opcional)</span>
+                </label>
+                <input hlmInput type="text" [(ngModel)]="newBodyDesc"
+                  placeholder="Breve descrição" class="w-full" />
+              </div>
+              @if (bodyError()) {
+                <p class="text-sm text-red-600">{{ bodyError() }}</p>
+              }
+              <button hlmBtn class="w-full" (click)="addBodyType()"
+                [disabled]="savingBody() || !newBodyName.trim()">
+                @if (savingBody()) { Criando... } @else { Criar tipo }
+              </button>
+            </div>
+          </div>
+
+          <!-- List -->
+          <div class="lg:col-span-2">
+            @if (!bodyTypes().length) {
+              <div class="bg-white rounded-2xl border border-slate-200 p-10 text-center">
+                <p class="text-slate-500">Nenhum tipo de carroceria cadastrado.</p>
+              </div>
+            } @else {
+              <div class="space-y-3">
+                @for (item of bodyTypes(); track item.id) {
+                  <div class="bg-white rounded-2xl border border-slate-200 p-4 flex items-center justify-between gap-3">
+                    <div class="flex-1 min-w-0">
+                      <div class="flex items-center gap-2">
+                        <p class="font-medium text-slate-900">{{ item.name }}</p>
+                        @if (!item.active) {
+                          <span hlmBadge [variant]="'outline'">Inativo</span>
+                        }
+                      </div>
+                      @if (item.description) {
+                        <p class="text-sm text-slate-500 mt-0.5">{{ item.description }}</p>
+                      }
+                    </div>
+                    <div class="flex gap-2 flex-shrink-0">
+                      <button hlmBtn variant="outline" size="sm" (click)="openEdit('body', item)">
+                        Editar
+                      </button>
+                      <button hlmBtn variant="destructive" size="sm" (click)="openDelete('body', item)">
+                        Remover
+                      </button>
+                    </div>
+                  </div>
+                }
+              </div>
+            }
+          </div>
+        </div>
+      }
+    }
+  </div>
+</section>
+
+<!-- Edit Modal -->
+@if (editModal()) {
+  <div
+    class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm px-4"
+    (click)="editModal.set(null)"
+  >
+    <div class="bg-white rounded-2xl p-6 w-full max-w-md shadow-xl" (click)="$event.stopPropagation()">
+      <h3 class="text-lg font-semibold text-slate-900 mb-5">
+        Editar {{ editModal()!.type === 'truck' ? 'tipo de caminhão' : 'tipo de carroceria' }}
+      </h3>
+      <div class="space-y-4">
+        <div>
+          <label class="block text-sm font-medium text-slate-700 mb-1">Nome *</label>
+          <input hlmInput type="text" [(ngModel)]="editName" class="w-full" />
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-slate-700 mb-1">Descrição</label>
+          <input hlmInput type="text" [(ngModel)]="editDesc" class="w-full" />
+        </div>
+        <div class="flex items-center gap-2">
+          <input type="checkbox" id="editActive" [(ngModel)]="editActive"
+            class="w-4 h-4 rounded border-slate-300 text-primary focus:ring-primary/30" />
+          <label for="editActive" class="text-sm font-medium text-slate-700">Ativo</label>
+        </div>
+      </div>
+      @if (saveError()) {
+        <p class="text-sm text-red-600 mt-3">{{ saveError() }}</p>
+      }
+      <div class="flex gap-3 justify-end mt-5">
+        <button hlmBtn variant="outline" (click)="editModal.set(null)">Cancelar</button>
+        <button hlmBtn (click)="saveEdit()" [disabled]="saving() || !editName.trim()">
+          @if (saving()) { Salvando... } @else { Salvar }
+        </button>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- Delete Modal -->
+@if (deleteModal()) {
+  <div
+    class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm px-4"
+    (click)="deleteModal.set(null)"
+  >
+    <div class="bg-white rounded-2xl p-6 w-full max-w-sm shadow-xl" (click)="$event.stopPropagation()">
+      <h3 class="text-lg font-semibold text-slate-900 mb-2">Remover item?</h3>
+      <p class="text-sm text-slate-500 mb-4">
+        Você está prestes a remover
+        <span class="font-semibold text-slate-700">{{ deleteModal()!.item.name }}</span>.
+        Esta ação não pode ser desfeita se o item não estiver em uso.
+      </p>
+      @if (deleteError()) {
+        <div class="bg-red-50 border border-red-200 rounded-xl px-3 py-2 mb-4">
+          <p class="text-sm text-red-700">{{ deleteError() }}</p>
+        </div>
+      }
+      <div class="flex gap-3 justify-end">
+        <button hlmBtn variant="outline" (click)="deleteModal.set(null)">Cancelar</button>
+        <button hlmBtn variant="destructive" (click)="confirmDelete()" [disabled]="deleting()">
+          @if (deleting()) { Removendo... } @else { Remover }
+        </button>
+      </div>
+    </div>
+  </div>
+}

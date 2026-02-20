@@ -95,11 +95,11 @@ export class NovaSenhaComponent implements OnInit {
       },
       error: (err) => {
         this.loading.set(false);
-        const code = err?.error?.error?.code;
+        const code = err?.code;
         if (code === 'TOKEN_INVALIDO' || code === 'TOKEN_EXPIRADO') {
           this.errorMessage.set('Link inválido ou expirado. Solicite um novo link de recuperação.');
         } else {
-          this.errorMessage.set('Ocorreu um erro. Tente novamente.');
+          this.errorMessage.set('Ocorreu um erro.' + + err?.error.message);
         }
       },
     });

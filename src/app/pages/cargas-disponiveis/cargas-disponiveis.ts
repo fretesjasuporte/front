@@ -188,7 +188,7 @@ export class CargasDisponiveisComponent implements OnInit {
       },
       error: (err) => {
         this.submitting.set(false);
-        const code = err?.error?.error?.code;
+        const code = err?.code;
         if (code === 'JA_SOLICITADO') {
           this.modalError.set('Você já demonstrou interesse nessa carga.');
         } else if (code === 'CAMINHONEIRO_NAO_APROVADO') {
@@ -196,7 +196,7 @@ export class CargasDisponiveisComponent implements OnInit {
         } else if (code === 'CAMINHAO_NAO_CADASTRADO') {
           this.modalError.set('Você precisa cadastrar seu caminhão antes de solicitar cargas.');
         } else {
-          this.modalError.set('Ocorreu um erro. Tente novamente.');
+          this.modalError.set('Ocorreu um erro.' + + err?.error.message);
         }
       },
     });
