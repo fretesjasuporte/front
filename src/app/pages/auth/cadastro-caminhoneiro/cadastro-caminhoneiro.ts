@@ -34,7 +34,6 @@ export class CadastroCaminhoneiroComponent {
     password: ['', [Validators.required, Validators.minLength(8), passwordStrength]],
     phone: ['', Validators.required],
     cpf: ['', Validators.required],
-    birth_date: ['', Validators.required],
   });
 
   readonly loading = signal(false);
@@ -80,9 +79,9 @@ export class CadastroCaminhoneiroComponent {
     this.loading.set(true);
     this.errorMessage.set(null);
 
-    const { name, email, password, phone, cpf, birth_date } = this.form.value;
+    const { name, email, password, phone, cpf } = this.form.value;
 
-    this.auth.registerTrucker({ name: name!, email: email!, password: password!, phone: phone!, cpf: cpf!, birth_date: birth_date! }).subscribe({
+    this.auth.registerTrucker({ name: name!, email: email!, password: password!, phone: phone!, cpf: cpf! }).subscribe({
       next: () => {
         this.loading.set(false);
         this.auth.redirectAfterLogin();

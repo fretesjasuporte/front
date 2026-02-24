@@ -1,203 +1,233 @@
-<div class="min-h-screen relative flex items-center justify-center px-4 py-16">
+<div class="min-h-screen relative flex items-center justify-center py-16">
 
   <!-- Background image + overlay -->
   <div class="absolute inset-0 bg-cover bg-center bg-no-repeat" style="background-image: url('/background.jpeg')"></div>
   <div class="absolute inset-0 bg-slate-900/65"></div>
   <div class="absolute inset-0 bg-gradient-to-br from-red-950/30 via-transparent to-slate-900/40"></div>
 
-  <div class="relative z-10 w-full max-w-lg">
+  <div class="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 items-center">
 
-    <!-- Logo -->
-    <div class="text-center mb-8">
-      <a routerLink="/" class="inline-flex items-center gap-2.5 group">
-        <div class="w-10 h-10 rounded-xl bg-primary flex items-center justify-center shadow-lg">
-          <svg class="w-6 h-6 text-white" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M3 4a1 1 0 0 1 1-1h12a1 1 0 0 1 .894.553L19.382 7H21a1 1 0 0 1 1 1v6a1 1 0 0 1-1 1h-1.17A3 3 0 0 1 14 17H10a3 3 0 0 1-5.83-2H4a1 1 0 0 1-1-1V4zm14.382 3-1.5-3H5v9h.17A3 3 0 0 1 10 11h4a3 3 0 0 1 4.83 2H21V9h-2a1 1 0 0 1-.894-.553L17.382 7zM8 15a1 1 0 1 0 0 2 1 1 0 0 0 0-2zm6 0a1 1 0 1 0 0 2 1 1 0 0 0 0-2z"/>
-          </svg>
-        </div>
-        <span class="text-2xl font-bold text-white tracking-tight">
-          Fretes<span class="text-brand-green">JA</span>
-        </span>
-      </a>
-      <p class="text-slate-300 text-sm mt-3">Crie sua conta de motorista</p>
-    </div>
+      <!-- Esquerda: texto flutuante (desktop) -->
+      <div class="hidden lg:flex flex-col gap-10">
 
-    <!-- Card branco -->
-    <div class="bg-white rounded-2xl p-8 shadow-2xl shadow-black/40">
-
-      <h1 class="text-xl font-semibold text-slate-900 mb-6">Cadastro de Caminhoneiro</h1>
-
-      @if (errorMessage()) {
-        <div class="flex items-center gap-3 bg-red-50 border border-red-200 rounded-xl px-4 py-3 mb-6">
-          <svg class="w-4 h-4 text-red-500 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="8" y2="12"/><line x1="12" x2="12.01" y1="16" y2="16"/>
-          </svg>
-          <p class="text-red-600 text-sm">{{ errorMessage() }}</p>
-        </div>
-      }
-
-      <form [formGroup]="form" (ngSubmit)="onSubmit()" class="flex flex-col gap-5">
-
-        <!-- Nome -->
         <div>
-          <label class="block text-sm font-medium text-slate-700 mb-1.5" for="name">Nome completo</label>
-          <input
-            hlmInput
-            id="name"
-            type="text"
-            placeholder="João da Silva"
-            formControlName="name"
-            class="w-full"
-            autocomplete="name"
-          />
-          @if (isInvalid('name')) {
-            <p class="text-red-500 text-xs mt-1.5">Informe seu nome completo (mínimo 3 caracteres).</p>
-          }
+          <span class="text-brand-green text-sm font-semibold tracking-widest uppercase">Cadastro de Motorista</span>
+          <h1 class="text-5xl font-bold text-white mt-4 leading-tight">Sou<br>Caminhoneiro</h1>
+          <p class="text-slate-300 text-xl mt-6 leading-relaxed">
+            Cadastre seu caminhão, envie seus documentos e comece a receber ofertas de frete de transportadoras parceiras em todo o Brasil.
+          </p>
         </div>
 
-        <!-- E-mail -->
-        <div>
-          <label class="block text-sm font-medium text-slate-700 mb-1.5" for="email">E-mail</label>
-          <input
-            hlmInput
-            id="email"
-            type="email"
-            placeholder="seu@email.com"
-            formControlName="email"
-            class="w-full"
-            autocomplete="email"
-          />
-          @if (isInvalid('email')) {
-            <p class="text-red-500 text-xs mt-1.5">Informe um e-mail válido.</p>
-          }
+        <ul class="flex flex-col gap-4">
+          <li class="flex items-center gap-3">
+            <div class="w-6 h-6 rounded-full bg-brand-green/20 border border-brand-green/40 flex items-center justify-center flex-shrink-0">
+              <svg class="w-3.5 h-3.5 text-brand-green" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <path d="M20 6 9 17l-5-5"/>
+              </svg>
+            </div>
+            <span class="text-slate-200 text-base">Acesso a cargas disponíveis</span>
+          </li>
+          <li class="flex items-center gap-3">
+            <div class="w-6 h-6 rounded-full bg-brand-green/20 border border-brand-green/40 flex items-center justify-center flex-shrink-0">
+              <svg class="w-3.5 h-3.5 text-brand-green" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <path d="M20 6 9 17l-5-5"/>
+              </svg>
+            </div>
+            <span class="text-slate-200 text-base">Solicitação de frete em 1 clique</span>
+          </li>
+          <li class="flex items-center gap-3">
+            <div class="w-6 h-6 rounded-full bg-brand-green/20 border border-brand-green/40 flex items-center justify-center flex-shrink-0">
+              <svg class="w-3.5 h-3.5 text-brand-green" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <path d="M20 6 9 17l-5-5"/>
+              </svg>
+            </div>
+            <span class="text-slate-200 text-base">Acompanhe seus fretes em tempo real</span>
+          </li>
+        </ul>
+
+      </div>
+
+      <!-- Direita: card do formulário -->
+      <div class="w-full max-w-lg mx-auto lg:max-w-none">
+
+        <!-- Logo (mobile) -->
+        <div class="text-center mb-8 lg:hidden">
+          <a routerLink="/" class="inline-flex items-center gap-2.5 group">
+            <div class="w-10 h-10 rounded-xl bg-primary flex items-center justify-center shadow-lg">
+              <svg class="w-6 h-6 text-white" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M3 4a1 1 0 0 1 1-1h12a1 1 0 0 1 .894.553L19.382 7H21a1 1 0 0 1 1 1v6a1 1 0 0 1-1 1h-1.17A3 3 0 0 1 14 17H10a3 3 0 0 1-5.83-2H4a1 1 0 0 1-1-1V4zm14.382 3-1.5-3H5v9h.17A3 3 0 0 1 10 11h4a3 3 0 0 1 4.83 2H21V9h-2a1 1 0 0 1-.894-.553L17.382 7zM8 15a1 1 0 1 0 0 2 1 1 0 0 0 0-2zm6 0a1 1 0 1 0 0 2 1 1 0 0 0 0-2z"/>
+              </svg>
+            </div>
+            <span class="text-2xl font-bold text-white tracking-tight">
+              Fretes<span class="text-brand-green">JA</span>
+            </span>
+          </a>
+          <p class="text-slate-300 text-sm mt-3">Crie sua conta de motorista</p>
         </div>
 
-        <!-- Senha -->
-        <div>
-          <label class="block text-sm font-medium text-slate-700 mb-1.5" for="password">Senha</label>
-          <div class="relative">
-            <input
-              hlmInput
-              id="password"
-              [type]="showPassword() ? 'text' : 'password'"
-              placeholder="••••••••"
-              formControlName="password"
-              class="w-full pr-10"
-              autocomplete="new-password"
-            />
-            <button
-              type="button"
-              (click)="showPassword.set(!showPassword())"
-              class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors"
-              tabindex="-1"
-            >
-              @if (showPassword()) {
-                <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/>
-                  <line x1="1" x2="23" y1="1" y2="23"/>
-                </svg>
-              } @else {
-                <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
-                </svg>
-              }
-            </button>
-          </div>
-          @if (form.get('password')?.value) {
-            <div class="mt-2 flex items-center gap-2">
-              <div class="flex-1 h-1.5 bg-slate-200 rounded-full overflow-hidden">
-                <div class="h-full rounded-full transition-all duration-300" [class]="passwordStrengthColor() + ' ' + passwordStrengthWidth()"></div>
-              </div>
-              <span class="text-xs text-slate-500">{{ passwordStrengthLabel() }}</span>
+        <!-- Card branco -->
+        <div class="bg-white rounded-2xl p-8 shadow-2xl shadow-black/40">
+
+          <h2 class="text-xl font-semibold text-slate-900 mb-6">Cadastro de Caminhoneiro</h2>
+
+          @if (errorMessage()) {
+            <div class="flex items-center gap-3 bg-red-50 border border-red-200 rounded-xl px-4 py-3 mb-6">
+              <svg class="w-4 h-4 text-red-500 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="8" y2="12"/><line x1="12" x2="12.01" y1="16" y2="16"/>
+              </svg>
+              <p class="text-red-600 text-sm">{{ errorMessage() }}</p>
             </div>
           }
-          @if (isInvalid('password')) {
-            <p class="text-red-500 text-xs mt-1.5">A senha deve ter no mínimo 8 caracteres, letras maiúsculas, minúsculas, número e símbolo.</p>
-          }
+
+          <form [formGroup]="form" (ngSubmit)="onSubmit()" class="flex flex-col gap-5">
+
+            <!-- Nome -->
+            <div>
+              <label class="block text-sm font-medium text-slate-700 mb-1.5" for="name">Nome completo</label>
+              <input
+                hlmInput
+                id="name"
+                type="text"
+                placeholder="João da Silva"
+                formControlName="name"
+                class="w-full"
+                autocomplete="name"
+              />
+              @if (isInvalid('name')) {
+                <p class="text-red-500 text-xs mt-1.5">Informe seu nome completo (mínimo 3 caracteres).</p>
+              }
+            </div>
+
+            <!-- E-mail -->
+            <div>
+              <label class="block text-sm font-medium text-slate-700 mb-1.5" for="email">E-mail</label>
+              <input
+                hlmInput
+                id="email"
+                type="email"
+                placeholder="seu@email.com"
+                formControlName="email"
+                class="w-full"
+                autocomplete="email"
+              />
+              @if (isInvalid('email')) {
+                <p class="text-red-500 text-xs mt-1.5">Informe um e-mail válido.</p>
+              }
+            </div>
+
+            <!-- Senha -->
+            <div>
+              <label class="block text-sm font-medium text-slate-700 mb-1.5" for="password">Senha</label>
+              <div class="relative">
+                <input
+                  hlmInput
+                  id="password"
+                  [type]="showPassword() ? 'text' : 'password'"
+                  placeholder="••••••••"
+                  formControlName="password"
+                  class="w-full pr-10"
+                  autocomplete="new-password"
+                />
+                <button
+                  type="button"
+                  (click)="showPassword.set(!showPassword())"
+                  class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors"
+                  tabindex="-1"
+                >
+                  @if (showPassword()) {
+                    <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/>
+                      <line x1="1" x2="23" y1="1" y2="23"/>
+                    </svg>
+                  } @else {
+                    <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
+                    </svg>
+                  }
+                </button>
+              </div>
+              @if (form.get('password')?.value) {
+                <div class="mt-2 flex items-center gap-2">
+                  <div class="flex-1 h-1.5 bg-slate-200 rounded-full overflow-hidden">
+                    <div class="h-full rounded-full transition-all duration-300" [class]="passwordStrengthColor() + ' ' + passwordStrengthWidth()"></div>
+                  </div>
+                  <span class="text-xs text-slate-500">{{ passwordStrengthLabel() }}</span>
+                </div>
+              }
+              @if (isInvalid('password')) {
+                <p class="text-red-500 text-xs mt-1.5">A senha deve ter no mínimo 8 caracteres, letras maiúsculas, minúsculas, número e símbolo.</p>
+              }
+            </div>
+
+            <!-- Telefone -->
+            <div>
+              <label class="block text-sm font-medium text-slate-700 mb-1.5" for="phone">Telefone / WhatsApp</label>
+              <input
+                hlmInput
+                id="phone"
+                type="tel"
+                placeholder="(11) 99999-9999"
+                formControlName="phone"
+                class="w-full"
+                autocomplete="tel"
+                [appMask]="'phone'"
+              />
+              @if (isInvalid('phone')) {
+                <p class="text-red-500 text-xs mt-1.5">Informe seu telefone.</p>
+              }
+            </div>
+
+            <!-- CPF -->
+            <div>
+              <label class="block text-sm font-medium text-slate-700 mb-1.5" for="cpf">CPF</label>
+              <input
+                hlmInput
+                id="cpf"
+                type="text"
+                placeholder="000.000.000-00"
+                formControlName="cpf"
+                class="w-full"
+                autocomplete="off"
+                [appMask]="'cpf'"
+              />
+              @if (isInvalid('cpf')) {
+                <p class="text-red-500 text-xs mt-1.5">Informe seu CPF.</p>
+              }
+            </div>
+
+            <!-- Submit -->
+            <button hlmBtn type="submit" size="lg" class="w-full font-semibold mt-1" [disabled]="loading()">
+              @if (loading()) {
+                <svg class="w-4 h-4 animate-spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M21 12a9 9 0 1 1-6.219-8.56"/>
+                </svg>
+                Criando conta...
+              } @else {
+                Criar conta
+              }
+            </button>
+
+          </form>
         </div>
 
-        <!-- Telefone -->
-        <div>
-          <label class="block text-sm font-medium text-slate-700 mb-1.5" for="phone">Telefone / WhatsApp</label>
-          <input
-            hlmInput
-            id="phone"
-            type="tel"
-            placeholder="(11) 99999-9999"
-            formControlName="phone"
-            class="w-full"
-            autocomplete="tel"
-            [appMask]="'phone'"
-          />
-          @if (isInvalid('phone')) {
-            <p class="text-red-500 text-xs mt-1.5">Informe seu telefone.</p>
-          }
+        <!-- Links -->
+        <div class="mt-6 text-center space-y-2">
+          <p class="text-slate-300 text-sm">
+            Já tem conta?
+            <a routerLink="/login" class="text-brand-green hover:text-brand-green/80 font-medium transition-colors ml-1">
+              Entrar
+            </a>
+          </p>
+          <p class="text-slate-300 text-sm">
+            É transportadora?
+            <a routerLink="/cadastro/transportadora" class="text-brand-green hover:text-brand-green/80 font-medium transition-colors ml-1">
+              Criar conta empresarial
+            </a>
+          </p>
         </div>
 
-        <!-- CPF e Data de nascimento -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div>
-            <label class="block text-sm font-medium text-slate-700 mb-1.5" for="cpf">CPF</label>
-            <input
-              hlmInput
-              id="cpf"
-              type="text"
-              placeholder="000.000.000-00"
-              formControlName="cpf"
-              class="w-full"
-              autocomplete="off"
-              [appMask]="'cpf'"
-            />
-            @if (isInvalid('cpf')) {
-              <p class="text-red-500 text-xs mt-1.5">Informe seu CPF.</p>
-            }
-          </div>
-          <div>
-            <label class="block text-sm font-medium text-slate-700 mb-1.5" for="birth_date">Data de nascimento</label>
-            <input
-              hlmInput
-              id="birth_date"
-              type="date"
-              formControlName="birth_date"
-              class="w-full"
-              autocomplete="bday"
-            />
-            @if (isInvalid('birth_date')) {
-              <p class="text-red-500 text-xs mt-1.5">Informe sua data de nascimento.</p>
-            }
-          </div>
-        </div>
-
-        <!-- Submit -->
-        <button hlmBtn type="submit" size="lg" class="w-full font-semibold mt-1" [disabled]="loading()">
-          @if (loading()) {
-            <svg class="w-4 h-4 animate-spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M21 12a9 9 0 1 1-6.219-8.56"/>
-            </svg>
-            Criando conta...
-          } @else {
-            Criar conta
-          }
-        </button>
-
-      </form>
+      </div>
     </div>
-
-    <!-- Links -->
-    <div class="mt-6 text-center space-y-2">
-      <p class="text-slate-300 text-sm">
-        Já tem conta?
-        <a routerLink="/login" class="text-brand-green hover:text-brand-green/80 font-medium transition-colors ml-1">
-          Entrar
-        </a>
-      </p>
-      <p class="text-slate-300 text-sm">
-        É transportadora?
-        <a routerLink="/cadastro/transportadora" class="text-brand-green hover:text-brand-green/80 font-medium transition-colors ml-1">
-          Criar conta empresarial
-        </a>
-      </p>
-    </div>
-
   </div>
 </div>

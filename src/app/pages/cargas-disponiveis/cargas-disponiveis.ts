@@ -1,6 +1,6 @@
 import { Component, inject, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { HlmButton } from '@spartan-ng/helm/button';
 import { HlmBadge } from '@spartan-ng/helm/badge';
 import { HlmCard, HlmCardContent, HlmCardFooter, HlmCardHeader } from '@spartan-ng/helm/card';
@@ -38,6 +38,7 @@ export interface TruckType {
 export class CargasDisponiveisComponent implements OnInit {
   readonly auth = inject(AuthService);
   private readonly api = inject(ApiService);
+  private readonly router = inject(Router);
 
   // Estado principal
   readonly cargas = signal<Load[]>([]);
@@ -88,9 +89,7 @@ export class CargasDisponiveisComponent implements OnInit {
       error: () => {},
     });
 
-    if (this.auth.isAuthenticated()) {
-      this.loadCargas(true);
-    }
+    this.loadCargas(true);
   }
 
   loadCargas(reset: boolean): void {
@@ -115,7 +114,8 @@ export class CargasDisponiveisComponent implements OnInit {
     if (this.filterTipoCarga()) params['cargo_type'] = this.filterTipoCarga();
     if (this.filterTruckTypeId()) params['truck_type_id'] = this.filterTruckTypeId();
 
-    this.api.getPaginated<Load>('loads', params).subscribe({
+    const endpoint = this.auth.isAuthenticated() ? 'loads' : 'public/loads';
+    this.api.getPaginated<Load>(endpoint, params).subscribe({
       next: (res) => {
         this.cargas.update((prev) => reset ? res.data : [...prev, ...res.data]);
         this.total.set(res.pagination.total);
@@ -188,15 +188,21 @@ export class CargasDisponiveisComponent implements OnInit {
       },
       error: (err) => {
         this.submitting.set(false);
-        const code = err?.code;
+        const code = err?.error?.error?.code;
         if (code === 'JA_SOLICITADO') {
           this.modalError.set('Você já demonstrou interesse nessa carga.');
-        } else if (code === 'CAMINHONEIRO_NAO_APROVADO') {
+        } else if (code === 'CAMINHONEIRO_NAO_APROVADO' || code === 'CADASTRO_NAO_APROVADO') {
           this.modalError.set('Seu cadastro ainda está em análise. Aguarde a aprovação para solicitar cargas.');
         } else if (code === 'CAMINHAO_NAO_CADASTRADO') {
           this.modalError.set('Você precisa cadastrar seu caminhão antes de solicitar cargas.');
+        } else if (code === 'PERFIL_INCOMPLETO') {
+          this.fecharModal();
+          this.router.navigate(['/motorista/perfil']);
+        } else if (code === 'DOCUMENTOS_PENDENTES') {
+          this.fecharModal();
+          this.router.navigate(['/motorista/documentos']);
         } else {
-          this.modalError.set('Ocorreu um erro.' + + err?.error.message);
+          this.modalError.set('Ocorreu um erro ao enviar o interesse. Tente novamente.');
         }
       },
     });

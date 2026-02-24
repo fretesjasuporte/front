@@ -1,14 +1,34 @@
-import { Component } from '@angular/core';
+import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { HlmButton } from '@spartan-ng/helm/button';
 import { HlmCard, HlmCardContent } from '@spartan-ng/helm/card';
+import { ApiService } from '../../core/services/api.service';
+
+interface PublicStats {
+  loads_available: number;
+  carriers: number;
+  approved_truckers: number;
+}
 
 @Component({
   selector: 'app-home',
   imports: [RouterLink, HlmButton, HlmCard, HlmCardContent],
   templateUrl: './home.html',
 })
-export class HomeComponent {
+export class HomeComponent implements OnInit {
+  private readonly api = inject(ApiService);
+
+  readonly stats = signal<PublicStats | null>(null);
+
+  readonly statsDisplay = computed(() => {
+    const s = this.stats();
+    return [
+      { n: s ? s.approved_truckers.toLocaleString('pt-BR') + '+' : '500+', l: 'Motoristas parceiros' },
+      { n: s ? s.loads_available.toLocaleString('pt-BR') + '+' : '1.200+', l: 'Cargas disponíveis' },
+      { n: '27', l: 'Estados atendidos' },
+    ];
+  });
+
   readonly benefits = [
     {
       icon: 'payment',
@@ -49,4 +69,11 @@ export class HomeComponent {
       description: 'Demonstre interesse na carga e entre em contato diretamente com o embarcador.',
     },
   ];
+
+  ngOnInit(): void {
+    this.api.get<PublicStats>('public/stats').subscribe({
+      next: (res) => this.stats.set(res.data),
+      error: () => {},
+    });
+  }
 }

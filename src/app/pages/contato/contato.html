@@ -1,0 +1,135 @@
+<!-- Header -->
+<div class="pt-20 relative">
+  <div class="absolute inset-0 bg-cover bg-center bg-no-repeat" style="background-image: url('/background.jpeg')"></div>
+  <div class="absolute inset-0 bg-slate-900/70"></div>
+  <div class="relative z-10 max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-20 text-center">
+    <span class="text-brand-green text-sm font-semibold tracking-widest uppercase">Suporte</span>
+    <h1 class="text-4xl sm:text-5xl font-bold text-white mt-3 leading-tight">Fale Conosco</h1>
+    <p class="text-slate-300 text-lg mt-4 leading-relaxed max-w-xl mx-auto">
+      Tem dúvidas, sugestões ou precisa de ajuda? Preencha o formulário e nossa equipe entrará em contato.
+    </p>
+  </div>
+</div>
+
+<!-- Form -->
+<section class="py-16 bg-slate-50 min-h-screen">
+  <div class="max-w-xl mx-auto px-4 sm:px-6 lg:px-8">
+
+    @if (success()) {
+      <!-- Sucesso -->
+      <div class="bg-white rounded-2xl border border-slate-200 p-12 text-center shadow-sm">
+        <div class="w-16 h-16 rounded-full bg-green-100 flex items-center justify-center mx-auto mb-5">
+          <svg class="w-8 h-8 text-green-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M20 6 9 17l-5-5"/>
+          </svg>
+        </div>
+        <h2 class="text-xl font-bold text-slate-900 mb-2">Mensagem enviada!</h2>
+        <p class="text-slate-500 text-sm leading-relaxed max-w-xs mx-auto">
+          Recebemos seu contato. Nossa equipe responderá em breve no e-mail informado.
+        </p>
+        <button hlmBtn variant="outline" class="mt-6" (click)="success.set(false)">
+          Enviar outra mensagem
+        </button>
+      </div>
+
+    } @else {
+      <!-- Card do formulário -->
+      <div class="bg-white rounded-2xl border border-slate-200 p-8 shadow-sm">
+        <h2 class="text-lg font-semibold text-slate-900 mb-6">Envie sua mensagem</h2>
+
+        @if (errorMessage()) {
+          <div class="flex items-center gap-3 bg-red-50 border border-red-200 rounded-xl px-4 py-3 mb-5">
+            <svg class="w-4 h-4 text-red-500 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="8" y2="12"/><line x1="12" x2="12.01" y1="16" y2="16"/>
+            </svg>
+            <p class="text-red-600 text-sm">{{ errorMessage() }}</p>
+          </div>
+        }
+
+        <form [formGroup]="form" (ngSubmit)="onSubmit()" class="flex flex-col gap-5">
+
+          <!-- Título -->
+          <div>
+            <label class="block text-sm font-medium text-slate-700 mb-1.5" for="title">
+              Título <span class="text-red-500">*</span>
+            </label>
+            <input
+              hlmInput
+              id="title"
+              type="text"
+              placeholder="Ex: Dúvida sobre cadastro"
+              formControlName="title"
+              class="w-full"
+              autocomplete="off"
+            />
+            @if (isInvalid('title')) {
+              <p class="text-red-500 text-xs mt-1.5">Informe um título (mínimo 3 caracteres).</p>
+            }
+          </div>
+
+          <!-- E-mail -->
+          <div>
+            <label class="block text-sm font-medium text-slate-700 mb-1.5" for="email">
+              E-mail <span class="text-red-500">*</span>
+            </label>
+            <input
+              hlmInput
+              id="email"
+              type="email"
+              placeholder="seu@email.com"
+              formControlName="email"
+              class="w-full"
+              autocomplete="email"
+            />
+            @if (isInvalid('email')) {
+              <p class="text-red-500 text-xs mt-1.5">Informe um e-mail válido.</p>
+            }
+          </div>
+
+          <!-- Assunto -->
+          <div>
+            <label class="block text-sm font-medium text-slate-700 mb-1.5" for="subject">
+              Assunto <span class="text-red-500">*</span>
+            </label>
+            <textarea
+              id="subject"
+              formControlName="subject"
+              rows="5"
+              maxlength="1000"
+              placeholder="Descreva detalhadamente sua dúvida ou solicitação..."
+              class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary resize-none transition-colors"
+            ></textarea>
+            <div class="flex justify-between items-center mt-1">
+              @if (isInvalid('subject')) {
+                <p class="text-red-500 text-xs">Descreva o assunto (mínimo 5 caracteres).</p>
+              } @else {
+                <span></span>
+              }
+              <p class="text-xs text-slate-400">{{ form.get('subject')?.value?.length ?? 0 }}/1000</p>
+            </div>
+          </div>
+
+          <!-- Submit -->
+          <button
+            hlmBtn
+            type="submit"
+            size="lg"
+            class="w-full font-semibold"
+            [disabled]="submitting()"
+          >
+            @if (submitting()) {
+              <svg class="w-4 h-4 animate-spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 12a9 9 0 1 1-6.219-8.56"/>
+              </svg>
+              Enviando...
+            } @else {
+              Enviar mensagem
+            }
+          </button>
+
+        </form>
+      </div>
+    }
+
+  </div>
+</section>

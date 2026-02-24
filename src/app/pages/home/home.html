@@ -45,11 +45,11 @@
           Ver cargas disponíveis
         </a>
         <a
-          routerLink="/cadastrar-caminhao"
+          href="#cadastro"
           hlmBtn
           variant="outline"
           size="lg"
-          class="text-base px-8 font-semibold border-white/20 text-white bg-white/5 hover:bg-white/10 hover:border-white/30 backdrop-blur-sm"
+          class="text-base px-8 font-semibold border-white/20 text-white bg-white/5 hover:bg-white/10 hover:border-white/30 hover:text-white backdrop-blur-sm"
         >
           <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" x2="19" y1="8" y2="14"/><line x1="22" x2="16" y1="11" y2="11"/>
@@ -60,7 +60,7 @@
 
       <!-- Stats -->
       <div class="flex flex-wrap gap-10 mt-16 pt-8 border-t border-white/10">
-        @for (stat of [{n:'500+', l:'Motoristas parceiros'},{n:'1.200+', l:'Cargas transportadas'},{n:'27', l:'Estados atendidos'}]; track stat.l) {
+        @for (stat of statsDisplay(); track stat.l) {
           <div>
             <p class="text-3xl font-bold text-white">{{ stat.n }}</p>
             <p class="text-slate-400 text-sm mt-1">{{ stat.l }}</p>
@@ -166,7 +166,7 @@
 </section>
 
 <!-- ═══════════════════════ CADASTRO ═══════════════════════ -->
-<section class="py-24 bg-white">
+<section id="cadastro" class="py-24 bg-white">
   <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
     <div class="text-center mb-14">
       <span class="text-primary text-sm font-semibold tracking-widest uppercase">Faça parte da plataforma</span>
@@ -263,44 +263,3 @@
   </div>
 </section>
 
-<!-- ═══════════════════════ CTA ═══════════════════════ -->
-<section class="relative py-24 overflow-hidden bg-neutral-950">
-  <div class="absolute inset-0 bg-gradient-to-r from-red-950/60 to-neutral-950"></div>
-  <div class="absolute top-0 right-0 w-[500px] h-[500px] bg-brand-green/8 rounded-full blur-3xl pointer-events-none"></div>
-  <div class="absolute bottom-0 left-0 w-[500px] h-[400px] bg-primary/12 rounded-full blur-3xl pointer-events-none"></div>
-
-  <div class="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-    <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-brand-green/10 border border-brand-green/20 text-brand-green text-sm font-medium mb-8">
-      <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <path d="m13 2-2 2.5h3L12 7"/><path d="M10 14v-3"/><path d="M14 14v-3"/><path d="M11 19H6.16a2 2 0 0 1-1.42-3.4L8 12.01V9l-2-2h8l-2 2v3.01l3.26 3.59A2 2 0 0 1 17.84 19H13"/>
-      </svg>
-      Comece agora mesmo
-    </div>
-
-    <h2 class="text-4xl sm:text-5xl font-bold text-white mb-6 leading-tight">
-      Pronto para aumentar<br />
-      <span class="text-transparent bg-clip-text bg-gradient-to-r from-orange-400 via-amber-300 to-yellow-400">
-        sua renda?
-      </span>
-    </h2>
-    <p class="text-slate-300 text-xl leading-relaxed mb-10 max-w-2xl mx-auto">
-      Cadastre seu caminhão agora e comece a receber ofertas de frete
-      de embarcadores em todo o Brasil.
-    </p>
-
-    <div class="flex flex-col sm:flex-row gap-4 justify-center">
-      <a routerLink="/cadastrar-caminhao" hlmBtn size="lg" class="text-base px-10 font-semibold shadow-lg shadow-primary/30">
-        Cadastrar caminhão
-      </a>
-      <a
-        routerLink="/cargas-disponiveis"
-        hlmBtn
-        variant="outline"
-        size="lg"
-        class="text-base px-10 font-semibold border-white/20 text-white bg-white/5 hover:bg-white/10"
-      >
-        Ver cargas disponíveis
-      </a>
-    </div>
-  </div>
-</section>

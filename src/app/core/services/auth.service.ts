@@ -63,10 +63,6 @@ export class AuthService {
     email: string;
     password: string;
     phone: string;
-    legal_name: string;
-    cnpj: string;
-    trade_name?: string;
-    business_email?: string;
   }) {
     return this.http
       .post<{ success: boolean; data: AuthResponse }>(

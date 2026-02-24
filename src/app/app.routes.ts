@@ -16,6 +16,11 @@ export const routes: Routes = [
       ),
   },
 
+  {
+    path: 'contato',
+    loadComponent: () => import('./pages/contato/contato').then((m) => m.ContatoComponent),
+  },
+
   // ── Auth ──────────────────────────────────────────────────────────────────
   {
     path: 'login',

@@ -1,6 +1,6 @@
 import { Component, inject, signal } from '@angular/core';
 import { AbstractControl, FormBuilder, ReactiveFormsModule, ValidationErrors, Validators } from '@angular/forms';
-import { Router, RouterLink } from '@angular/router';
+import { RouterLink } from '@angular/router';
 import { HlmButton } from '@spartan-ng/helm/button';
 import { HlmInput } from '@spartan-ng/helm/input';
 import { AuthService } from '../../../core/services/auth.service';
@@ -26,17 +26,12 @@ function passwordStrength(control: AbstractControl): ValidationErrors | null {
 export class CadastroTransportadoraComponent {
   private readonly fb = inject(FormBuilder);
   private readonly auth = inject(AuthService);
-  private readonly router = inject(Router);
 
   readonly form = this.fb.group({
     name: ['', [Validators.required, Validators.minLength(3)]],
     email: ['', [Validators.required, Validators.email]],
     password: ['', [Validators.required, Validators.minLength(8), passwordStrength]],
     phone: ['', Validators.required],
-    legal_name: ['', Validators.required],
-    cnpj: ['', Validators.required],
-    trade_name: [''],
-    business_email: ['', Validators.email],
   });
 
   readonly loading = signal(false);
@@ -81,18 +76,9 @@ export class CadastroTransportadoraComponent {
     this.loading.set(true);
     this.errorMessage.set(null);
 
-    const { name, email, password, phone, legal_name, cnpj, trade_name, business_email } = this.form.value;
+    const { name, email, password, phone } = this.form.value;
 
-    this.auth.registerCarrier({
-      name: name!,
-      email: email!,
-      password: password!,
-      phone: phone!,
-      legal_name: legal_name!,
-      cnpj: cnpj!,
-      trade_name: trade_name || undefined,
-      business_email: business_email || undefined,
-    }).subscribe({
+    this.auth.registerCarrier({ name: name!, email: email!, password: password!, phone: phone! }).subscribe({
       next: () => {
         this.loading.set(false);
         this.auth.redirectAfterLogin();
@@ -103,8 +89,6 @@ export class CadastroTransportadoraComponent {
         const msg = err?.error?.error?.message ?? err?.error?.message;
         if (code === 'EMAIL_JA_CADASTRADO') {
           this.errorMessage.set('Este e-mail já está cadastrado. Faça login ou recupere sua senha.');
-        } else if (code === 'CNPJ_JA_CADASTRADO') {
-          this.errorMessage.set('Este CNPJ já está cadastrado.');
         } else {
           this.errorMessage.set('Ocorreu um erro ao criar sua conta.' + (msg ? ' ' + msg : ' Tente novamente.'));
         }
