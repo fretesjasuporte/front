@@ -157,6 +157,19 @@
                   </div>
                 </div>
 
+                @if (carga.truck_type) {
+                  <div class="flex items-center gap-2.5">
+                    <div class="text-primary flex-shrink-0 w-14 h-8" [innerHTML]="truckSvgFor(carga.truck_type.name)"></div>
+                    <div class="min-w-0">
+                      <p class="text-xs text-muted-foreground">Veículo</p>
+                      <p class="text-sm font-medium text-slate-800 truncate">
+                        {{ carga.truck_type.name }}
+                        @if (carga.body_type) {<span class="text-muted-foreground"> · {{ carga.body_type.name }}</span>}
+                      </p>
+                    </div>
+                  </div>
+                }
+
                 <div class="flex items-center justify-between pt-2 border-t border-slate-100">
                   <span class="text-xs text-muted-foreground">Valor do frete</span>
                   <span class="text-lg font-bold text-primary">{{ formatValue(carga.freight_value) }}</span>

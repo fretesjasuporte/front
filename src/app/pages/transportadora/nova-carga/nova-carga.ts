@@ -1,9 +1,12 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
+import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { HlmButton } from '@spartan-ng/helm/button';
 import { HlmInput } from '@spartan-ng/helm/input';
 import { ApiService, Load } from '../../../core/services/api.service';
+import { TRUCK_SVG_MAP, BODY_SVG_MAP } from '../../../core/utils/vehicle-icons';
 
 interface TruckType { id: string; name: string; }
 interface BodyType { id: string; name: string; }
@@ -33,6 +36,8 @@ const ESTADOS = [
 export class NovaCargaComponent implements OnInit {
   private readonly api = inject(ApiService);
   private readonly fb = inject(FormBuilder);
+  private readonly router = inject(Router);
+  private readonly sanitizer = inject(DomSanitizer);
 
   readonly estados = ESTADOS;
   readonly truckTypes = signal<TruckType[]>([]);
@@ -62,6 +67,34 @@ export class NovaCargaComponent implements OnInit {
     pickup_date: [''],
     estimated_delivery_date: [''],
     notes: [''],
+  });
+
+  private readonly formValue = toSignal(this.form.valueChanges, {
+    initialValue: this.form.value,
+  });
+
+  readonly selectedTruckType = computed(() => {
+    const id = this.formValue()?.truck_type_id;
+    return this.truckTypes().find(t => t.id === id) ?? null;
+  });
+
+  readonly selectedBodyType = computed(() => {
+    const id = this.formValue()?.body_type_id;
+    return this.bodyTypes().find(b => b.id === id) ?? null;
+  });
+
+  readonly truckMeta = computed((): { capacity: string; svg: SafeHtml } | null => {
+    const name = this.selectedTruckType()?.name ?? '';
+    const data = TRUCK_SVG_MAP[name];
+    if (!data) return null;
+    return { capacity: data.capacity, svg: this.sanitizer.bypassSecurityTrustHtml(data.svgStr) };
+  });
+
+  readonly bodyMeta = computed((): { label: string; svg: SafeHtml } | null => {
+    const name = this.selectedBodyType()?.name ?? '';
+    const data = BODY_SVG_MAP[name];
+    if (!data) return null;
+    return { label: data.label, svg: this.sanitizer.bypassSecurityTrustHtml(data.svgStr) };
   });
 
   ngOnInit(): void {
@@ -150,6 +183,8 @@ export class NovaCargaComponent implements OnInit {
         const code = err?.error?.error?.code;
         if (code === 'COMBINACAO_INCOMPATIVEL') {
           this.errorMessage.set('A carroceria selecionada não é compatível com esse tipo de caminhão.');
+        } else if (code === 'PERFIL_INCOMPLETO') {
+          this.router.navigate(['/transportadora/perfil']);
         } else {
           this.errorMessage.set('Ocorreu um erro ao criar a carga. Tente novamente.');
         }

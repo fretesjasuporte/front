@@ -1,9 +1,12 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
+import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { HlmButton } from '@spartan-ng/helm/button';
 import { HlmInput } from '@spartan-ng/helm/input';
 import { ApiService, Load } from '../../../core/services/api.service';
+import { TRUCK_SVG_MAP, BODY_SVG_MAP } from '../../../core/utils/vehicle-icons';
 
 interface TruckType { id: string; name: string; }
 interface BodyType { id: string; name: string; }
@@ -35,6 +38,7 @@ export class DetalheCargaComponent implements OnInit {
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   private readonly fb = inject(FormBuilder);
+  private readonly sanitizer = inject(DomSanitizer);
 
   readonly estados = ESTADOS;
   readonly carga = signal<Load | null>(null);
@@ -68,6 +72,50 @@ export class DetalheCargaComponent implements OnInit {
     pickup_date: [''],
     estimated_delivery_date: [''],
     notes: [''],
+  });
+
+  // ── Prévia visual (modo view) ────────────────────────────────────────────
+  readonly viewTruckMeta = computed((): { capacity: string; svg: SafeHtml } | null => {
+    const name = this.carga()?.truck_type?.name ?? '';
+    const data = TRUCK_SVG_MAP[name];
+    if (!data) return null;
+    return { capacity: data.capacity, svg: this.sanitizer.bypassSecurityTrustHtml(data.svgStr) };
+  });
+
+  readonly viewBodyMeta = computed((): { label: string; svg: SafeHtml } | null => {
+    const name = this.carga()?.body_type?.name ?? '';
+    const data = BODY_SVG_MAP[name];
+    if (!data) return null;
+    return { label: data.label, svg: this.sanitizer.bypassSecurityTrustHtml(data.svgStr) };
+  });
+
+  // ── Prévia visual (modo edit) ─────────────────────────────────────────────
+  private readonly formValue = toSignal(this.form.valueChanges, {
+    initialValue: this.form.value,
+  });
+
+  readonly selectedTruckType = computed(() => {
+    const id = this.formValue()?.truck_type_id;
+    return this.truckTypes().find(t => t.id === id) ?? null;
+  });
+
+  readonly selectedBodyType = computed(() => {
+    const id = this.formValue()?.body_type_id;
+    return this.bodyTypes().find(b => b.id === id) ?? null;
+  });
+
+  readonly editTruckMeta = computed((): { capacity: string; svg: SafeHtml } | null => {
+    const name = this.selectedTruckType()?.name ?? '';
+    const data = TRUCK_SVG_MAP[name];
+    if (!data) return null;
+    return { capacity: data.capacity, svg: this.sanitizer.bypassSecurityTrustHtml(data.svgStr) };
+  });
+
+  readonly editBodyMeta = computed((): { label: string; svg: SafeHtml } | null => {
+    const name = this.selectedBodyType()?.name ?? '';
+    const data = BODY_SVG_MAP[name];
+    if (!data) return null;
+    return { label: data.label, svg: this.sanitizer.bypassSecurityTrustHtml(data.svgStr) };
   });
 
   ngOnInit(): void {

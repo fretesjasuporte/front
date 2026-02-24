@@ -1,9 +1,11 @@
 import { Component, inject, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
+import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { HlmButton } from '@spartan-ng/helm/button';
 import { HlmCard, HlmCardContent, HlmCardFooter, HlmCardHeader } from '@spartan-ng/helm/card';
 import { ApiService, Load } from '../../../core/services/api.service';
+import { TRUCK_SVG_MAP, BODY_SVG_MAP } from '../../../core/utils/vehicle-icons';
 
 @Component({
   selector: 'app-minhas-cargas',
@@ -13,6 +15,7 @@ import { ApiService, Load } from '../../../core/services/api.service';
 export class MinhasCargasComponent implements OnInit {
   private readonly api = inject(ApiService);
   private readonly router = inject(Router);
+  private readonly sanitizer = inject(DomSanitizer);
 
   readonly cargas = signal<Load[]>([]);
   readonly loading = signal(false);
@@ -153,5 +156,19 @@ export class MinhasCargasComponent implements OnInit {
   formatDate(dateStr: string): string {
     if (!dateStr) return '';
     return new Date(dateStr).toLocaleDateString('pt-BR');
+  }
+
+  truckSvgFor(name: string): SafeHtml | null {
+    const data = TRUCK_SVG_MAP[name];
+    return data ? this.sanitizer.bypassSecurityTrustHtml(data.svgStr) : null;
+  }
+
+  truckCapacityFor(name: string): string {
+    return TRUCK_SVG_MAP[name]?.capacity ?? '';
+  }
+
+  bodySvgFor(name: string): SafeHtml | null {
+    const data = BODY_SVG_MAP[name];
+    return data ? this.sanitizer.bypassSecurityTrustHtml(data.svgStr) : null;
   }
 }
